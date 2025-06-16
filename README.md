@@ -222,8 +222,7 @@ Validation failed.
 
 - **Full User Guide & JSON Specification**: Our complete documentation is hosted on *
   *[Read the Docs](https://[your-project].readthedocs.io)**.
-- **Developer's Guide**: For a deep dive into the architecture, see the **[How It Works guide](./docs/how-it-works.md)
-  **.
+- **Developer's Guide**: For a deep dive into the architecture, see the **[How It Works guide](#)**.
 - **Interactive AI-Powered Docs**: *(Coming Soon)* An interactive documentation experience.
 
 ## 🤝 Contributing
