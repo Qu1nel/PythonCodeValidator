@@ -42,7 +42,7 @@ jobs:
       # Step for Unix
       - name: Activate venv and run checks
         shell: bash
-        if: runner.os =! 'Windows'
+        if: runner.os != 'Windows'
         run: |
           source .venv/bin/activate
           
