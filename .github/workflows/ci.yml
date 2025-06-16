@@ -1,0 +1,53 @@
+name: Python Code Validator CI
+
+# Триггеры: запускать на push в main и на все pull request'ы
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    # Запускать на разных ОС
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # Не отменять все остальные джобы, если одна упала
+      fail-fast: false
+      matrix:
+        # И на разных версиях Python
+        os: [ ubuntu-latest, windows-latest ]
+        python-version: [ "3.11", "3.12" ]
+
+    steps:
+      # Шаг 1: Получаем код из репозитория
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # Шаг 2: Настраиваем uv (официальный action)
+      - name: Setup uv
+        uses: yutailang0119/setup-uv@v1
+        with:
+          enable-cache: true
+
+      # Шаг 3: Настраиваем Python с помощью uv
+      - name: Set up Python ${{ matrix.python-version }}
+        run: uv venv -p ${{ matrix.python-version }}
+
+      # Шаг 4: Устанавливаем зависимости (включая dev)
+      - name: Install dependencies
+        run: uv pip install -e ".[dev]"
+
+      # Шаг 5: Проверяем форматирование и стиль
+      - name: Lint and Format with ruff
+        run: uv python -m ruff check src/ tests/ && uv python -m ruff format --check src/ tests/
+
+      # Шаг 6: Запускаем тесты
+      - name: Run tests with coverage
+        run: uv python -m coverage run -m unittest discover tests
+
+      # Шаг 7: Загружаем отчет о покрытии
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
