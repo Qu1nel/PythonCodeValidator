@@ -220,8 +220,8 @@ Validation failed.
 
 ## 📚 Documentation
 
-- **Full User Guide & JSON Specification**: Our complete documentation is hosted on *
-  *[Read the Docs](https://[your-project].readthedocs.io)**.
+- **Full User Guide & JSON Specification**: Our complete documentation is hosted on
+  **[Read the Docs](https://[your-project].readthedocs.io)**.
 - **Developer's Guide**: For a deep dive into the architecture, see the **[How It Works guide](#)**.
 - **Interactive AI-Powered Docs**: *(Coming Soon)* An interactive documentation experience.
 
@@ -230,8 +230,8 @@ Validation failed.
 Contributions make the open-source community an amazing place to learn, inspire, and create. Any contributions you make
 are **greatly appreciated**.
 
-Please read our **[Contributing Guidelines](./CONTRIBUTING.md)** to get started. This project adheres to the *
-*[Code of Conduct](./CODE_OF_CONDUCT.md)**.
+Please read our **[Contributing Guidelines](./CONTRIBUTING.md)** to get started. This project adheres to the
+**[Code of Conduct](./CODE_OF_CONDUCT.md)**.
 
 ## 📜 License
 
