@@ -43,7 +43,7 @@ jobs:
 
       - name: Install dependencies from lockfile
         run:
-          uv pip install -e ".[dev]"
+          uv pip install -e ".[dev]" && pip install coverage && uv pip install coverage
 
       - name: Run linting and tests
         run: |
