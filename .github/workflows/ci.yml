@@ -1,6 +1,5 @@
 name: Python Code Validator CI
 
-# Триггеры: запускать на push в main и на все pull request'ы
 on:
   push:
     branches: [ "main" ]
@@ -9,45 +8,57 @@ on:
 
 jobs:
   build-and-test:
-    # Запускать на разных ОС
     runs-on: ${{ matrix.os }}
     strategy:
-      # Не отменять все остальные джобы, если одна упала
       fail-fast: false
       matrix:
-        # И на разных версиях Python
         os: [ ubuntu-latest, windows-latest ]
         python-version: [ "3.11", "3.12" ]
 
     steps:
-      # Шаг 1: Получаем код из репозитория
       - name: Check out repository
         uses: actions/checkout@v4
 
-      # Шаг 2: Настраиваем uv (официальный action)
-      - name: Setup uv
-        uses: yutailang0119/setup-uv@v1
-        with:
-          enable-cache: true
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+        if: runner.os == 'Linux' || runner.os == 'macOS'
 
-      # Шаг 3: Настраиваем Python с помощью uv
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Install uv (Windows)
+        run: powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+        if: runner.os == 'Windows'
+
+      - name: Add uv to PATH
+        run: echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+        if: runner.os == 'Linux' || runner.os == 'macOS'
+
+      - name: Add uv to PATH (Windows)
+        run: echo "$((Get-Item (Get-Command uv).Source).Directory.FullName)" | Out-File -FilePath $env:GITHUB_PATH -Append
+        if: runner.os == 'Windows'
+
+      - name: Set up Python with uv
         run: uv venv -p ${{ matrix.python-version }}
 
-      # Шаг 4: Устанавливаем зависимости (включая dev)
-      - name: Install dependencies
-        run: uv pip install -e ".[dev]"
+      - name: Activate venv and Install dependencies
+        shell: bash
+        run: |
+          source .venv/bin/activate
+          uv pip install -e ".[dev]"
 
-      # Шаг 5: Проверяем форматирование и стиль
       - name: Lint and Format with ruff
-        run: uv python -m ruff check src/ tests/ && uv python -m ruff format --check src/ tests/
+        shell: bash
+        run: |
+          source .venv/bin/activate
+          ruff check src/ tests/
+          ruff format --check src/ tests/
 
-      # Шаг 6: Запускаем тесты
       - name: Run tests with coverage
-        run: uv python -m coverage run -m unittest discover tests
+        shell: bash
+        run: |
+          source .venv/bin/activate
+          coverage run -m unittest discover tests
 
-      # Шаг 7: Загружаем отчет о покрытии
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: true
