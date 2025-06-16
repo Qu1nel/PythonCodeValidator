@@ -1,0 +1,10 @@
+{
+  "description": "Только проверка PEP8 для отладки",
+  "validation_rules": [
+    {
+      "rule_id": 999,
+      "type": "check_linter_pep8",
+      "message": "Найдены ошибки PEP8"
+    }
+  ]
+}

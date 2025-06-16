@@ -1,5 +1,4 @@
 """Simple program for basic checks."""
-# Этот файл должен проходить базовую валидацию
 import sys
 
 GLOBAL_CONST = "ALLOWED"
@@ -7,9 +6,10 @@ GLOBAL_CONST = "ALLOWED"
 
 def solve():
     """This function is required."""
-    x = 12  # local var
+    x = 12
     print(x)
-    print(sys.version)
+    # Используем sys, чтобы flake8 был доволен
+    print(f"Python version: {sys.version_info.major}.{sys.version_info.minor}")
 
 
 def main():

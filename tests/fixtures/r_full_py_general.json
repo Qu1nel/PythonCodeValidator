@@ -169,8 +169,9 @@
           "type": "value_must_be_in",
           "allowed_values": [
             "__main__",
-            "OK",
-            "ALLOWED"
+            "ALLOWED",
+            "Python version: ",
+            "."
           ]
         }
       }

@@ -11,7 +11,7 @@ from typing import Literal
 
 from .config import LogLevel
 
-LOG_FORMAT = "%(asctime)s - [%(levelname)s] - %(message)s"
+LOG_FORMAT = "%(asctime)s | %(filename)-15s | %(funcName)-15s (%(lineno)-3s) | [%(levelname)s] - %(message)s"
 DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
@@ -65,10 +65,10 @@ class Console:
         self._stdout = sys.stdout
 
     def print(
-        self,
-        message: str,
-        *,
-        level: LogLevel | Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = LogLevel.INFO,
+            self,
+            message: str,
+            *,
+            level: LogLevel | Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = LogLevel.INFO,
     ) -> None:
         """Prints a message to stdout and logs it simultaneously.
 

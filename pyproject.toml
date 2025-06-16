@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "python-code-validator"
-version = "0.1.0"
+version = "0.1.1"
 authors = [{ name = "Qu1nel", email = "covach.qn@gmail.com" }]
 description = "A flexible framework for static validation of Python code based on JSON rules."
 readme = "README.md"
@@ -34,6 +34,7 @@ validate-code = "code_validator.cli:run_from_cli"
 [project.optional-dependencies]
 dev = [
     "ruff>=0.4.0",
+    "flake8>=7.0.0",
     "build",
     "twine",
     "coverage>=7.5.0",
