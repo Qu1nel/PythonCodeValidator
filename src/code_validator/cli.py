@@ -1,3 +1,10 @@
+"""Defines the command-line interface for the code validator.
+
+This module is responsible for parsing command-line arguments, setting up the
+application configuration, and orchestrating the main validation workflow. It acts
+as the primary entry point for user interaction.
+"""
+
 import argparse
 import sys
 from pathlib import Path
@@ -10,6 +17,11 @@ from .output import Console, setup_logging
 
 
 def setup_arg_parser() -> argparse.ArgumentParser:
+    """Creates and configures the argument parser for the CLI.
+
+    Returns:
+        An instance of argparse.ArgumentParser with all arguments defined.
+    """
     parser = argparse.ArgumentParser(
         prog="validate-code",
         description="Validates a Python source file against a set of JSON rules.",
@@ -20,7 +32,7 @@ def setup_arg_parser() -> argparse.ArgumentParser:
         "-l",
         "--log-level",
         type=LogLevel,
-        choices=list(LogLevel),
+        choices=LogLevel,
         default=LogLevel.WARNING,
         help="Set the logging level (default: WARNING).",
     )
@@ -31,9 +43,16 @@ def setup_arg_parser() -> argparse.ArgumentParser:
 
 
 def run_from_cli() -> None:
+    """Runs the full application lifecycle from the command line.
+
+    This function parses arguments, initializes logging and configuration,
+    runs the validator, and handles all top-level exceptions, exiting with an
+    appropriate exit code.
+    """
     parser = setup_arg_parser()
     args = parser.parse_args()
 
+    # 1. Setup environment
     logger = setup_logging(args.log_level)
     console = Console(logger, is_silent=args.silent)
     config = AppConfig(
@@ -44,16 +63,17 @@ def run_from_cli() -> None:
         stop_on_first_fail=args.stop_on_first_fail,
     )
 
+    # 2. Run main logic with robust error handling
     try:
         console.print(f"Starting validation for: {config.solution_path}", level=LogLevel.INFO)
         validator = StaticValidator(config, console)
         is_valid = validator.run()
 
         if is_valid:
-            console.print("Validation successful.", level="INFO")
+            console.print("Validation successful.", level=LogLevel.INFO)
             sys.exit(ExitCode.SUCCESS)
         else:
-            console.print("Validation failed.", level="ERROR")
+            console.print("Validation failed.", level=LogLevel.ERROR)
             sys.exit(ExitCode.VALIDATION_FAILED)
 
     except CodeValidatorError as e:

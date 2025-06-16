@@ -4,8 +4,7 @@ import json
 from .components.ast_utils import enrich_ast_with_parents
 from .components.definitions import Rule
 from .components.factories import RuleFactory
-from .config import AppConfig
-from .config import LogLevel
+from .config import AppConfig, LogLevel
 from .exceptions import RuleParsingError
 from .output import Console
 

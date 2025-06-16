@@ -1,3 +1,11 @@
+"""Defines all data structures and configuration models for the validator.
+
+This module contains Enum classes for standardized codes and several frozen
+dataclasses that represent the structured configuration loaded from JSON files
+and command-line arguments. These models ensure type safety and provide a
+clear "shape" for the application's data.
+"""
+
 from dataclasses import dataclass, field
 from enum import IntEnum, StrEnum
 from pathlib import Path
@@ -5,6 +13,8 @@ from typing import Any
 
 
 class ExitCode(IntEnum):
+    """Defines standardized exit codes for the command-line application."""
+
     SUCCESS = 0
     VALIDATION_FAILED = 1
     FILE_NOT_FOUND = 2
@@ -13,6 +23,8 @@ class ExitCode(IntEnum):
 
 
 class LogLevel(StrEnum):
+    """Defines the supported logging levels for the application."""
+
     DEBUG = "DEBUG"
     INFO = "INFO"
     WARNING = "WARNING"
@@ -22,6 +34,8 @@ class LogLevel(StrEnum):
 
 @dataclass(frozen=True)
 class AppConfig:
+    """Stores the main application configuration from CLI arguments."""
+
     solution_path: Path
     rules_path: Path
     log_level: LogLevel
@@ -31,6 +45,8 @@ class AppConfig:
 
 @dataclass(frozen=True)
 class SelectorConfig:
+    """Represents the configuration for a Selector component from a JSON rule."""
+
     type: str
     name: str | None = None
     node_type: str | list[str] | None = None
@@ -39,6 +55,8 @@ class SelectorConfig:
 
 @dataclass(frozen=True)
 class ConstraintConfig:
+    """Represents the configuration for a Constraint component from a JSON rule."""
+
     type: str
     count: int | None = None
     parent_name: str | None = None
@@ -51,12 +69,16 @@ class ConstraintConfig:
 
 @dataclass(frozen=True)
 class FullRuleCheck:
+    """Represents the 'check' block within a full validation rule."""
+
     selector: SelectorConfig
     constraint: ConstraintConfig
 
 
 @dataclass(frozen=True)
 class ShortRuleConfig:
+    """Represents a 'short' (pre-defined) validation rule from JSON."""
+
     rule_id: int
     type: str
     message: str
@@ -65,10 +87,13 @@ class ShortRuleConfig:
 
 @dataclass(frozen=True)
 class FullRuleConfig:
+    """Represents a 'full' (custom) validation rule with selector and constraint."""
+
     rule_id: int
     message: str
     check: FullRuleCheck
     is_critical: bool = False
 
 
+# A type alias representing any possible rule configuration object.
 ValidationRuleConfig = ShortRuleConfig | FullRuleConfig

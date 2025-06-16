@@ -1,3 +1,11 @@
+"""Contains factories for creating rule, selector, and constraint objects.
+
+This module implements the Factory Method design pattern to decouple the core
+validator engine from the concrete implementation of rules. Factories are
+responsible for parsing raw dictionary configurations from JSON and instantiating
+the appropriate handler classes.
+"""
+
 import dataclasses
 from typing import Any, Type, TypeVar
 
@@ -30,19 +38,67 @@ T = TypeVar("T")
 
 
 def _create_dataclass_from_dict(cls: Type[T], data: dict[str, Any]) -> T:
-    """Safely creates a dataclass instance from a dictionary, ignoring extra keys."""
+    """Safely creates a dataclass instance from a dictionary.
+
+    This helper function filters the input dictionary to include only the keys
+    that correspond to fields in the target dataclass, preventing `TypeError`
+    for unexpected arguments.
+
+    Args:
+        cls: The dataclass type to instantiate.
+        data: The dictionary with raw data.
+
+    Returns:
+        An instance of the specified dataclass.
+    """
     expected_fields = {f.name for f in dataclasses.fields(cls)}
     filtered_data = {k: v for k, v in data.items() if k in expected_fields}
     return cls(**filtered_data)
 
 
 class RuleFactory:
+    """Creates rule handler objects from raw dictionary configuration.
+
+    This is the main factory that acts as an entry point for parsing the
+    'validation_rules' list from a JSON file. It determines whether a rule is
+    a "short" pre-defined type or a "full" custom rule and delegates the
+    creation of its components to other specialized factories.
+
+    Attributes:
+        _console (Console): An instance of the console for logging.
+        _selector_factory (SelectorFactory): A factory for creating selector objects.
+        _constraint_factory (ConstraintFactory): A factory for creating constraint objects.
+    """
+
     def __init__(self, console: Console):
+        """Initializes the RuleFactory.
+
+        Args:
+            console: An instance of the Console for logging and output,
+                to be passed to rule handlers.
+        """
         self._console = console
         self._selector_factory = SelectorFactory()
         self._constraint_factory = ConstraintFactory()
 
     def create(self, rule_config: dict[str, Any]) -> Rule:
+        """Creates a specific rule instance based on its configuration.
+
+        This method acts as a dispatcher. It determines whether the configuration
+        describes a "short" pre-defined rule or a "full" custom rule with a
+        selector/constraint pair, and then delegates to the appropriate
+        creation logic.
+
+        Args:
+            rule_config: A dictionary parsed from the JSON rules file.
+
+        Returns:
+            An instance of an object that conforms to the Rule protocol.
+
+        Raises:
+            RuleParsingError: If the rule configuration is invalid, missing
+                required keys, or specifies an unknown type.
+        """
         rule_id = rule_config.get("rule_id")
         try:
             if "type" in rule_config:
@@ -65,8 +121,6 @@ class RuleFactory:
                     check=check_cfg,
                     is_critical=rule_config.get("is_critical", False),
                 )
-
-                # 4. Создаем и возвращаем обработчик
                 return FullRuleHandler(config, selector, constraint, self._console)
             else:
                 raise RuleParsingError("Rule must contain 'type' or 'check' key.", rule_id)
@@ -74,7 +128,24 @@ class RuleFactory:
             raise RuleParsingError(f"Invalid config for rule '{rule_id}': {e}", rule_id) from e
 
     def _create_short_rule(self, config: ShortRuleConfig) -> Rule:
-        """Dispatches creation of short-rule handlers."""
+        """Dispatches the creation of handlers for "short" rules.
+
+        This private helper method acts as a registry for pre-defined, common
+        validation checks like syntax or PEP8 linting. It maps a rule's 'type'
+        string to a concrete Rule handler class.
+
+        Args:
+            config: The dataclass object containing the configuration for the
+                short rule.
+
+        Returns:
+            An initialized instance of a concrete class that implements the
+            Rule protocol.
+
+        Raises:
+            RuleParsingError: If the 'type' specified in the config does not
+                correspond to any known short rule.
+        """
         if config.type == "check_syntax":
             return CheckSyntaxRule(config, self._console)
         elif config.type == "check_linter_pep8":
@@ -84,8 +155,28 @@ class RuleFactory:
 
 
 class SelectorFactory:
+    """Creates selector objects from raw dictionary configuration.
+
+    This factory is responsible for instantiating the correct Selector object
+    based on the 'type' field in a rule's selector configuration block. Each
+    concrete selector specializes in finding a specific type of AST node.
+    This class uses a static `create` method as it does not need to maintain
+    any state.
+    """
+
     @staticmethod
     def create(selector_config: dict[str, Any]) -> Selector:
+        """Creates a specific selector instance based on its type.
+
+        This method uses the 'type' field from the selector configuration
+        to determine which concrete Selector class to instantiate.
+
+        Args:
+            selector_config: The 'selector' block from a JSON rule.
+
+        Returns:
+            An instance of a class that conforms to the Selector protocol.
+        """
         config = _create_dataclass_from_dict(SelectorConfig, selector_config)
 
         match config.type:
@@ -110,10 +201,27 @@ class SelectorFactory:
 
 
 class ConstraintFactory:
-    """Creates constraint objects from raw dictionary configuration."""
+    """Creates constraint objects from raw dictionary configuration.
+
+    This factory is responsible for instantiating the correct Constraint object
+    based on the 'type' field in a rule's constraint configuration block.
+    Each concrete constraint specializes in applying a specific logical check
+    to a list of AST nodes. This class uses a static `create` method.
+    """
 
     @staticmethod
     def create(constraint_config: dict[str, Any]) -> Constraint:
+        """Creates a specific constraint instance based on its type.
+
+        This method uses the 'type' field from the constraint configuration
+        to determine which concrete Constraint class to instantiate.
+
+        Args:
+            constraint_config: The 'constraint' block from a JSON rule.
+
+        Returns:
+            An instance of a class that conforms to the Constraint protocol.
+        """
         config = _create_dataclass_from_dict(ConstraintConfig, constraint_config)
 
         match config.type:

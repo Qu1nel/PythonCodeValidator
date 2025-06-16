@@ -32,7 +32,7 @@ setup: ## Install all dependencies for development. Ex: make setup
 .PHONY: sync
 sync: ## Synchronize virtual environment with pyproject.toml. Ex: make sync
 	@echo "$(CYAN)› Syncing dependencies...$(RESET)"
-	@uv pip sync --all-extras
+	@uv pip sync ./src/
 	@echo "$(GREEN)✅ Dependencies are up to date.$(RESET)"
 
 .PHONY: lint
