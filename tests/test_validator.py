@@ -93,9 +93,16 @@ class TestStaticValidatorIntegration(unittest.TestCase):
 
     def test_linter_rule_passes_for_valid_code(self):
         """Tests that CheckLinterRule passes for clean code."""
-        rules = {"validation_rules": [{"rule_id": 1, "type": "check_linter_pep8", "message": "PEP8 fail", "params": {
-            "ignore": ["F401", "E302", "E305", "E261"]
-        }}]}
+        rules = {
+            "validation_rules": [
+                {
+                    "rule_id": 1,
+                    "type": "check_linter_pep8",
+                    "message": "PEP8 fail",
+                    "params": {"ignore": ["F401", "E302", "E305", "E261"]},
+                }
+            ]
+        }
         rules_path = FIXTURES_DIR / "temp_linter_rules.json"
         with open(rules_path, "w", encoding="utf-8") as f:
             # noinspection PyTypeChecker

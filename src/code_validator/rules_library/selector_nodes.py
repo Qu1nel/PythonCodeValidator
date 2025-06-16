@@ -271,13 +271,13 @@ class LiteralSelector(ScopedSelector):
             if not isinstance(node.value, expected_py_types):
                 continue
 
-            # --- ЛОГИКА ИГНОРИРОВАНИЯ ДОКСТРИНГОВ ---
-            # Если у узла есть родитель и этот родитель - Expr,
-            # то велика вероятность, что это докстринг или "висячая" строка.
-            # Настоящие "магические" строки обычно являются аргументами функций
-            # или значениями в присваиваниях.
+            # Пропускаем докстринги
             if hasattr(node, "parent") and isinstance(node.parent, ast.Expr):
-                continue  # Пропускаем этот узел, считая его докстрингом.
+                continue
+
+            # Пропускаем f-строки
+            if hasattr(node, "parent") and isinstance(node.parent, ast.JoinedStr):
+                continue
 
             found_nodes.append(node)
 
