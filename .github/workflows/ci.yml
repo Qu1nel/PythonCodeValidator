@@ -1,4 +1,4 @@
-name: Python Code Validator CI
+name: Tests & Lint
 
 on:
   push:
