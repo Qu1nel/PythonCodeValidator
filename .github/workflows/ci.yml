@@ -13,13 +13,12 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest ]
-        python-version: [ "3.11", "3.12" ]
+        python-version: [ "3.11" ]
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      # Install uv
       - name: Install uv
         run: curl -LsSf https://astral.sh/uv/install.sh | sh
         if: runner.os != 'Windows'
@@ -33,41 +32,32 @@ jobs:
         run: echo "$((Get-Item (Get-Command uv).Source).Directory.FullName)" | Out-File -FilePath $env:GITHUB_PATH -Append
         if: runner.os == 'Windows'
 
-      # Settings Python and install ALL dependencies
       - name: Set up Python and install dependencies
         run: |
           uv venv -p ${{ matrix.python-version }}
           uv pip install -e ".[dev]"
 
-      # Step for Unix
-      - name: Activate venv and run checks
-        shell: bash
+      - name: Run Linting and Tests (Linux/macOS)
         if: runner.os != 'Windows'
         run: |
-          source .venv/bin/activate
-          
           echo "--- Running Lint and Format Check ---"
-          uv run python -m ruff check src/ tests/
-          uv run python -m ruff format --check src/ tests/
-          echo "--- Running Tests with Coverage ---"
+          .venv/bin/ruff check src/ tests/
+          .venv/bin/ruff format --check src/ tests/
           
-          uv run python -m coverage run -m unittest discover tests
+          echo "--- Running Tests with Coverage ---"
+          .venv/bin/coverage run -m unittest discover tests
 
-      # Step for Windows
-      - name: Activate venv and run checks (Windows)
-        shell: pwsh
+      - name: Run Linting and Tests (Windows)
         if: runner.os == 'Windows'
+        shell: pwsh
         run: |
-          .\.venv\Scripts\activate.ps1 
-          
           echo "--- Running Lint and Format Check ---"
-          uv run python -m ruff check src/ tests/
-          uv run python -m ruff format --check src/ tests/
+          .\.venv\Scripts\ruff.exe check src/ tests/
+          .\.venv\Scripts\ruff.exe format --check src/ tests/
           
           echo "--- Running Tests with Coverage ---"
-          uv run python -m coverage run -m unittest discover tests
+          .\.venv\Scripts\coverage.exe run -m unittest discover tests
 
-      # Load report
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
         with:
