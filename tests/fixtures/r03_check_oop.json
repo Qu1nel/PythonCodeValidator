@@ -1,0 +1,36 @@
+{
+  "description": "Checks for correct OOP structure.",
+  "validation_rules": [
+    {
+      "rule_id": 301,
+      "message": "Класс 'CorrectChild' должен наследоваться от 'Parent'.",
+      "check": {
+        "selector": {
+          "type": "class_def",
+          "name": "CorrectChild"
+        },
+        "constraint": {
+          "type": "must_inherit_from",
+          "parent_name": "Parent"
+        }
+      }
+    },
+    {
+      "rule_id": 302,
+      "message": "В конструкторе класса 'CorrectChild' должен создаваться атрибут 'self.name'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "self.name",
+          "in_scope": {
+            "class": "CorrectChild",
+            "method": "__init__"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    }
+  ]
+}

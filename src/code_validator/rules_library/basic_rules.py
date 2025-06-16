@@ -1,10 +1,6 @@
 import ast
-import io
-import tempfile
-from contextlib import redirect_stdout
-from pathlib import Path
-
-from flake8.api import legacy as flake8
+import subprocess
+import sys
 
 from ..components.definitions import Constraint, Rule, Selector
 from ..config import FullRuleConfig, ShortRuleConfig
@@ -25,60 +21,67 @@ class CheckSyntaxRule(Rule):
 
 
 class CheckLinterRule(Rule):
-    """Handles the 'check_linter_pep8' short rule using the flake8 legacy API."""
+    """Handles the 'check_linter_pep8' short rule by running flake8 as a subprocess."""
 
     def __init__(self, config: ShortRuleConfig, console: Console):
-        """Initializes a PEP8 linter check rule handler."""
         self.config = config
         self._console = console
-        self.DEFAULT_IGNORE = ["E501", "W503"]
 
     def execute(self, tree: ast.Module | None, source_code: str | None = None) -> bool:
-        """Executes the flake8 linter by writing the source to a temporary file."""
+        """Executes the flake8 linter on the source code via a subprocess."""
         if not source_code:
             self._console.print("Source code is empty, skipping PEP8 check.", level="WARNING")
             return True
 
         self._console.print(f"Rule {self.config.rule_id}: Running flake8 linter...", level="DEBUG")
 
-        # Создаем временный файл с расширением .py
-        with tempfile.NamedTemporaryFile(mode="w+", suffix=".py", delete=False) as tmp_file:
-            tmp_file.write(source_code)
-            tmp_filepath = tmp_file.name
+        # 1. Собираем аргументы для flake8
+        params = self.config.params
+        args = [
+            sys.executable,  # Путь к текущему интерпретатору python
+            "-m",
+            "flake8",
+            "-",  # Специальный флаг, говорящий flake8 читать из stdin
+        ]
 
-        tmp_path = Path(tmp_filepath)
+        if select_list := params.get("select"):
+            args.append(f"--select={','.join(select_list)}")
+        elif ignore_list := params.get("ignore"):
+            args.append(f"--ignore={','.join(ignore_list)}")
 
         try:
-            # 1. Собираем список игнорируемых ошибок
-            ignore_list = list(set(self.config.params.get("ignore", []) + self.DEFAULT_IGNORE))
-
-            # 2. Создаем StyleGuide
-            style_guide = flake8.get_style_guide(
-                ignore=ignore_list,
-                select=self.config.params.get("select", []),
-                max_line_length=120,
+            # 2. Запускаем flake8 как отдельный процесс
+            #    - передаем код через stdin
+            #    - перехватываем stdout и stderr
+            process = subprocess.run(
+                args,
+                input=source_code,
+                capture_output=True,
+                text=True,  # Работаем с текстом, а не байтами
+                encoding="utf-8",
+                check=False,  # Не выбрасывать исключение при ненулевом коде выхода
             )
 
-            # 3. Перехватываем вывод flake8
-            output_buffer = io.StringIO()
-            with redirect_stdout(output_buffer):
-                report = style_guide.check_files([str(tmp_path)])
-
-            # 5. Проверяем результат
-            if report.total_errors > 0:
-                linter_output = output_buffer.getvalue().strip()
-                self._console.print(
-                    f"Flake8 found {report.total_errors} issue(s). Full report in DEBUG logs.", level="DEBUG"
-                )
-                self._console.print(linter_output, level="DEBUG")
+            # 3. Анализируем результат
+            if process.returncode != 0 and process.stdout:
+                # Если flake8 вернул ненулевой код и что-то напечатал, значит есть ошибки
+                linter_output = process.stdout.strip()
+                self._console.print(f"Flake8 found issues:\n{linter_output}", level="DEBUG")
+                return False
+            elif process.returncode != 0:
+                # Если код ненулевой, но вывод пустой, значит произошла ошибка в самом flake8
+                self._console.print(f"Flake8 exited with code {process.returncode}:\n{process.stderr}", level="ERROR")
                 return False
 
             self._console.print("PEP8 check passed.", level="DEBUG")
             return True
-        finally:
-            # 6. Гарантированно удаляем временный файл
-            if tmp_path.exists():
-                tmp_path.unlink()
+
+        except FileNotFoundError:
+            self._console.print("flake8 not found. Is it installed in the venv?", level="CRITICAL")
+            return False
+        except Exception as e:
+            self._console.print(f"An unexpected error occurred while running flake8: {e}", level="CRITICAL")
+            return False
 
 
 class FullRuleHandler(Rule):

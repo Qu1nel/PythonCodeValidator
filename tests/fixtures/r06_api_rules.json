@@ -1,0 +1,59 @@
+{
+  "description": "Validation rules for the API client task.",
+  "validation_rules": [
+    {
+      "rule_id": 601,
+      "message": "Необходимо импортировать библиотеку 'requests'.",
+      "check": {
+        "selector": {
+          "type": "import_statement",
+          "name": "requests"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 602,
+      "message": "Запрещено использовать модуль 'os' для сетевых запросов.",
+      "check": {
+        "selector": {
+          "type": "import_statement",
+          "name": "os"
+        },
+        "constraint": {
+          "type": "is_forbidden"
+        }
+      }
+    },
+    {
+      "rule_id": 603,
+      "message": "Необходимо определить глобальную константу 'API_KEY'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "API_KEY",
+          "in_scope": "global"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 604,
+      "message": "Необходимо реализовать функцию 'get_weather' с одним аргументом.",
+      "check": {
+        "selector": {
+          "type": "function_def",
+          "name": "get_weather"
+        },
+        "constraint": {
+          "type": "must_have_args",
+          "count": 1
+        }
+      }
+    }
+  ]
+}

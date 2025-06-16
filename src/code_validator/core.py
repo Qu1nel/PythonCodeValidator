@@ -1,9 +1,11 @@
 import ast
 import json
 
+from .components.ast_utils import enrich_ast_with_parents
 from .components.definitions import Rule
 from .components.factories import RuleFactory
-from .config import AppConfig, LogLevel
+from .config import AppConfig
+from .config import LogLevel
 from .exceptions import RuleParsingError
 from .output import Console
 
@@ -21,10 +23,10 @@ class StaticValidator:
         self._validation_rules: list[Rule] = []
         self._failed_rules: list[int] = []
 
-    def _execute_rule(self, rule: Rule) -> bool:
-        """Executes a single validation rule."""
-        self._console.print(f"Executing rule: {rule.config.rule_id}", level=LogLevel.DEBUG)
-        return rule.execute(self._ast_tree, self._source_code)
+    @property
+    def failed_rules_id(self) -> list[int]:
+        """Returns a list of rule IDs that failed during the last run."""
+        return self._failed_rules
 
     def _load_source_code(self) -> None:
         """Loads the content of the student's solution file."""
@@ -41,6 +43,7 @@ class StaticValidator:
         self._console.print("Parsing Abstract Syntax Tree (AST)...")
         try:
             self._ast_tree = ast.parse(self._source_code)
+            enrich_ast_with_parents(self._ast_tree)
             return True
         except SyntaxError as e:
             # Ищем правило check_syntax, чтобы вывести его кастомное сообщение
@@ -86,6 +89,7 @@ class StaticValidator:
             if getattr(rule.config, "type", None) == "check_syntax":
                 continue
 
+            self._console.print(f"Executing rule: {rule.config.rule_id}", level=LogLevel.DEBUG)
             is_passed = rule.execute(self._ast_tree, self._source_code)
             if not is_passed:
                 self._console.print(rule.config.message, level="ERROR")

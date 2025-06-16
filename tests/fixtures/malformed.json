@@ -1,0 +1,5 @@
+{
+  "description": "This JSON is broken",
+  "validation_rules": [
+    {"rule_id": 1, "message": "A rule"}
+  ] // Отсутствует закрывающая скобка

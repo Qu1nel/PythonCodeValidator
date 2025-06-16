@@ -1,0 +1,21 @@
+{
+  "description": "Checks for a required base structure.",
+  "validation_rules": [
+    {
+      "rule_id": 101,
+      "message": "Функция 'solve' должна существовать.",
+      "check": {
+        "selector": { "type": "function_def", "name": "solve" },
+        "constraint": { "type": "is_required" }
+      }
+    },
+    {
+      "rule_id": 102,
+      "message": "Главная точка входа 'main' должна существовать.",
+      "check": {
+        "selector": { "type": "function_def", "name": "main" },
+        "constraint": { "type": "is_required" }
+      }
+    }
+  ]
+}

@@ -1,4 +1,5 @@
-from typing import Any
+import dataclasses
+from typing import Any, Type, TypeVar
 
 from ..config import ConstraintConfig, FullRuleCheck, FullRuleConfig, SelectorConfig, ShortRuleConfig
 from ..exceptions import RuleParsingError
@@ -8,12 +9,14 @@ from ..rules_library.constraint_logic import (
     IsForbiddenConstraint,
     IsRequiredConstraint,
     MustBeTypeConstraint,
+    MustHaveArgsConstraint,
     MustInheritFromConstraint,
     NameMustBeInConstraint,
     ValueMustBeInConstraint,
 )
 from ..rules_library.selector_nodes import (
     AssignmentSelector,
+    AstNodeSelector,
     ClassDefSelector,
     FunctionCallSelector,
     FunctionDefSelector,
@@ -23,33 +26,47 @@ from ..rules_library.selector_nodes import (
 )
 from .definitions import Constraint, Rule, Selector
 
+T = TypeVar("T")
+
+
+def _create_dataclass_from_dict(cls: Type[T], data: dict[str, Any]) -> T:
+    """Safely creates a dataclass instance from a dictionary, ignoring extra keys."""
+    expected_fields = {f.name for f in dataclasses.fields(cls)}
+    filtered_data = {k: v for k, v in data.items() if k in expected_fields}
+    return cls(**filtered_data)
+
 
 class RuleFactory:
-    """Creates rule handler objects from raw dictionary configuration."""
-
     def __init__(self, console: Console):
         self._console = console
         self._selector_factory = SelectorFactory()
         self._constraint_factory = ConstraintFactory()
 
     def create(self, rule_config: dict[str, Any]) -> Rule:
-        """Creates a specific rule instance based on its configuration."""
         rule_id = rule_config.get("rule_id")
         try:
             if "type" in rule_config:
-                config = ShortRuleConfig(**rule_config)
+                config = _create_dataclass_from_dict(ShortRuleConfig, rule_config)
                 return self._create_short_rule(config)
+
             elif "check" in rule_config:
-                # --- ЛОГИКА ДЛЯ ПОЛНЫХ ПРАВИЛ ---
-                # 1. Парсим конфиг в датаклассы для валидации
-                check_config = FullRuleCheck(**rule_config["check"])
-                config = FullRuleConfig(**rule_config)
+                raw_selector_cfg = rule_config["check"]["selector"]
+                raw_constraint_cfg = rule_config["check"]["constraint"]
 
-                # 2. Создаем компоненты через другие фабрики
-                selector = self._selector_factory.create(check_config.selector.__dict__)
-                constraint = self._constraint_factory.create(check_config.constraint.__dict__)
+                selector = self._selector_factory.create(raw_selector_cfg)
+                constraint = self._constraint_factory.create(raw_constraint_cfg)
 
-                # 3. Создаем и возвращаем обработчик
+                selector_cfg = _create_dataclass_from_dict(SelectorConfig, raw_selector_cfg)
+                constraint_cfg = _create_dataclass_from_dict(ConstraintConfig, raw_constraint_cfg)
+                check_cfg = FullRuleCheck(selector=selector_cfg, constraint=constraint_cfg)
+                config = FullRuleConfig(
+                    rule_id=rule_config["rule_id"],
+                    message=rule_config["message"],
+                    check=check_cfg,
+                    is_critical=rule_config.get("is_critical", False),
+                )
+
+                # 4. Создаем и возвращаем обработчик
                 return FullRuleHandler(config, selector, constraint, self._console)
             else:
                 raise RuleParsingError("Rule must contain 'type' or 'check' key.", rule_id)
@@ -67,27 +84,27 @@ class RuleFactory:
 
 
 class SelectorFactory:
-    """Creates selector objects from raw dictionary configuration."""
-
     @staticmethod
     def create(selector_config: dict[str, Any]) -> Selector:
-        config = SelectorConfig(**selector_config)
-        # Используем match-case для чистоты и расширяемости
+        config = _create_dataclass_from_dict(SelectorConfig, selector_config)
+
         match config.type:
             case "function_def":
-                return FunctionDefSelector(**selector_config)
+                return FunctionDefSelector(name=config.name, in_scope_config=config.in_scope)
             case "class_def":
-                return ClassDefSelector(**selector_config)
+                return ClassDefSelector(name=config.name, in_scope_config=config.in_scope)
             case "import_statement":
-                return ImportStatementSelector(**selector_config)
+                return ImportStatementSelector(name=config.name, in_scope_config=config.in_scope)
             case "function_call":
-                return FunctionCallSelector(**selector_config)
+                return FunctionCallSelector(name=config.name, in_scope_config=config.in_scope)
             case "assignment":
-                return AssignmentSelector(**selector_config)
+                return AssignmentSelector(name=config.name, in_scope_config=config.in_scope)
             case "usage":
-                return UsageSelector(**selector_config)
+                return UsageSelector(name=config.name, in_scope_config=config.in_scope)
             case "literal":
-                return LiteralSelector(**selector_config)
+                return LiteralSelector(name=config.name, in_scope_config=config.in_scope)
+            case "ast_node":
+                return AstNodeSelector(node_type=config.node_type, in_scope_config=config.in_scope)
             case _:
                 raise RuleParsingError(f"Unknown selector type: '{config.type}'")
 
@@ -97,19 +114,22 @@ class ConstraintFactory:
 
     @staticmethod
     def create(constraint_config: dict[str, Any]) -> Constraint:
-        config = ConstraintConfig(**constraint_config)
+        config = _create_dataclass_from_dict(ConstraintConfig, constraint_config)
+
         match config.type:
             case "is_required":
-                return IsRequiredConstraint(**constraint_config)
-            case "must_inherit_from":
-                return MustInheritFromConstraint(**constraint_config)
+                return IsRequiredConstraint(count=config.count)
             case "is_forbidden":
-                return IsForbiddenConstraint(**constraint_config)
+                return IsForbiddenConstraint()
+            case "must_inherit_from":
+                return MustInheritFromConstraint(parent_name=config.parent_name)
             case "must_be_type":
-                return MustBeTypeConstraint(**constraint_config)
+                return MustBeTypeConstraint(expected_type=config.expected_type)
+            case "must_have_args":
+                return MustHaveArgsConstraint(count=config.count, names=config.names, exact_match=config.exact_match)
             case "name_must_be_in":
-                return NameMustBeInConstraint(**constraint_config)
+                return NameMustBeInConstraint(allowed_names=config.allowed_names)
             case "value_must_be_in":
-                return ValueMustBeInConstraint(**constraint_config)
+                return ValueMustBeInConstraint(allowed_values=config.allowed_values)
             case _:
                 raise RuleParsingError(f"Unknown constraint type: '{config.type}'")

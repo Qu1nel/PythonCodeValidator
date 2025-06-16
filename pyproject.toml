@@ -31,13 +31,21 @@ validate-code = "code_validator.cli:run_from_cli"
 
 
 [project.optional-dependencies]
-dev = ["ruff>=0.4.0"]
-
+dev = [
+    "ruff>=0.4.0",
+    "flake8>=7.0.0",
+    "build",
+    "twine"
+]
 
 [tool.ruff]
 line-length = 120
-lint.select = ["E", "F", "W", "I", "C", "B"]
-lint.ignore = []
+exclude = ["tests/fixtures"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "C", "B"]
+ignore = []
+mccabe.max-complexity = 15
 
 
 [tool.ruff.format]
@@ -45,5 +53,6 @@ quote-style = "double"
 
 [dependency-groups]
 dev = [
-    "flake8>=7.2.0",
+    "coverage>=7.9.1",
 ]
+

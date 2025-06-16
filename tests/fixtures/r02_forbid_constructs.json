@@ -1,0 +1,44 @@
+{
+  "description": "Checks for forbidden constructs.",
+  "validation_rules": [
+    {
+      "rule_id": 201,
+      "message": "Импорт модуля 'os' запрещен.",
+      "check": {
+        "selector": {
+          "type": "import_statement",
+          "name": "os"
+        },
+        "constraint": {
+          "type": "is_forbidden"
+        }
+      }
+    },
+    {
+      "rule_id": 202,
+      "message": "Использование 'eval' запрещено.",
+      "check": {
+        "selector": {
+          "type": "function_call",
+          "name": "eval"
+        },
+        "constraint": {
+          "type": "is_forbidden"
+        }
+      }
+    },
+    {
+      "rule_id": 203,
+      "message": "Использование циклов 'while' запрещено в этой задаче.",
+      "check": {
+        "selector": {
+          "type": "ast_node",
+          "node_type": "While"
+        },
+        "constraint": {
+          "type": "is_forbidden"
+        }
+      }
+    }
+  ]
+}

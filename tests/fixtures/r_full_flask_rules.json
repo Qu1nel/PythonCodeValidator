@@ -1,0 +1,35 @@
+{
+  "description": "Полный набор правил для задачи на Flask.",
+  "validation_rules": [
+    { "rule_id": 1, "type": "check_syntax", "message": "Синтаксическая ошибка." },
+    { "rule_id": 10, "message": "Необходимо импортировать 'Flask' из 'flask'.",
+      "check": {"selector": {"type": "import_statement", "name": "flask"}, "constraint": {"type": "is_required"}}
+    },
+    {
+      "rule_id": 20, "message": "Должна быть создана переменная 'app'.",
+      "check": {"selector": {"type": "assignment", "name": "app"}, "constraint": {"type": "is_required"}}
+    },
+    {
+      "rule_id": 21, "message": "Переменная 'app' должна быть экземпляром Flask.",
+      "check": {
+        "selector": {"type": "assignment", "name": "app"},
+        "constraint": {"type": "must_be_assigned_from_call", "function_name": "Flask"}
+      }
+    },
+    {
+      "rule_id": 30, "message": "Должна быть определена функция 'index'.",
+      "check": {"selector": {"type": "function_def", "name": "index"}, "constraint": {"type": "is_required"}}
+    },
+    {
+      "rule_id": 31, "message": "Функция 'index' должна быть декорирована.",
+      "check": {"selector": {"type": "decorator", "in_scope": {"function": "index"}}, "constraint": {"type": "is_required"}}
+    },
+    {
+      "rule_id": 32, "message": "Декоратор для 'index' должен быть '@app.route(\"/\")'.",
+      "check": {
+        "selector": {"type": "decorator_call", "name": "app.route", "in_scope": {"function": "index"}},
+        "constraint": {"type": "must_be_called_with", "args": ["/"]}
+      }
+    }
+  ]
+}

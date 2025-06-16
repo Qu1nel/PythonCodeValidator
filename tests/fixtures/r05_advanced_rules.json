@@ -1,0 +1,20 @@
+{
+  "description": "Advanced rules to test scope and complex selections.",
+  "validation_rules": [
+    {
+      "rule_id": 501,
+      "message": "Циклы 'while' запрещены внутри метода 'method_b' класса 'MyAdvancedClass'.",
+      "check": {
+        "selector": {
+          "type": "ast_node",
+          "node_type": "While",
+          "in_scope": {
+            "class": "MyAdvancedClass",
+            "method": "method_b"
+          }
+        },
+        "constraint": { "type": "is_forbidden" }
+      }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "file_type": "python",
+  "description": "Basic validation rules for testing.",
+  "validation_rules": [
+    {
+      "rule_id": 1,
+      "type": "check_syntax",
+      "message": "Syntax check failed."
+    },
+    {
+      "rule_id": 2,
+      "type": "check_linter_pep8",
+      "message": "PEP8 check failed.",
+      "params": {
+        "ignore": [
+          "E501"
+        ]
+      }
+    }
+  ]
+}

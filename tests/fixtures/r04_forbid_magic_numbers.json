@@ -1,0 +1,22 @@
+{
+  "description": "Forbids magic numbers, allowing only 0 and 1.",
+  "validation_rules": [
+    {
+      "rule_id": 401,
+      "message": "Не используйте 'магические числа', выносите их в константы.",
+      "check": {
+        "selector": {
+          "type": "literal",
+          "name": "number"
+        },
+        "constraint": {
+          "type": "value_must_be_in",
+          "allowed_values": [
+            0,
+            1
+          ]
+        }
+      }
+    }
+  ]
+}

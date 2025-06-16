@@ -40,6 +40,13 @@ class SelectorConfig:
 @dataclass(frozen=True)
 class ConstraintConfig:
     type: str
+    count: int | None = None
+    parent_name: str | None = None
+    expected_type: str | None = None
+    allowed_names: list[str] | None = None
+    allowed_values: list[Any] | None = None
+    names: list[str] | None = None
+    exact_match: bool | None = None
 
 
 @dataclass(frozen=True)

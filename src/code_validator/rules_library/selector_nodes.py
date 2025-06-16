@@ -3,54 +3,37 @@ from typing import Any
 
 from ..components.definitions import Selector
 from ..components.scope_handler import find_scope_node
+from ..rules_library.constraint_logic import _get_full_name
 
 
-def _get_full_name(node: ast.AST) -> str | None:
-    """Helper to get a full name like 'self.x' or 'my_var' from a node."""
-    if isinstance(node, ast.Name):
-        return node.id
-    if isinstance(node, ast.Attribute):
-        # Рекурсивно собираем имя, например, 'self.player.x'
-        base = _get_full_name(node.value)
-        return f"{base}.{node.attr}" if base else node.attr
-    return None
-
-
-class ScopeVisitor(ast.NodeVisitor):
-    """A NodeVisitor to find a specific scope (function or class) in the AST."""
-
-    def __init__(self, scope_name: str):
-        self.scope_name = scope_name
-        self.scope_node: ast.AST | None = None
-
-    def visit_FunctionDef(self, node: ast.FunctionDef):
-        if node.name == self.scope_name:
-            self.scope_node = node
-        # Не идем глубже, чтобы не найти вложенные функции с тем же именем
-        # self.generic_visit(node)
-
-    def visit_ClassDef(self, node: ast.ClassDef):
-        if node.name == self.scope_name:
-            self.scope_node = node
-        # Здесь мы *должны* идти глубже, чтобы найти методы внутри класса
-        self.generic_visit(node)
-
-
-class FunctionDefSelector(Selector):
-    """Selects function definition (def) nodes from an AST."""
+class ScopedSelector(Selector):
+    """An abstract base class for selectors that support scoping."""
 
     def __init__(self, **kwargs: Any):
-        self.name_to_find = kwargs.get("name")
         self.in_scope_config = kwargs.get("in_scope")
 
+    def _get_search_tree(self, tree: ast.Module) -> ast.AST | None:
+        """Determines the root node for the search based on the scope config."""
+        if not self.in_scope_config or self.in_scope_config == "global":
+            return tree
+
+        scope_node = find_scope_node(tree, self.in_scope_config)
+        return scope_node
+
     def select(self, tree: ast.Module) -> list[ast.AST]:
-        """Finds all ast.FunctionDef nodes that match the criteria."""
-        search_tree: ast.AST = tree
-        if self.in_scope_config and self.in_scope_config != "global":
-            scope_node = find_scope_node(tree, self.in_scope_config)
-            if not scope_node:
-                return []  # Если скоуп не найден, то и внутри него ничего нет
-            search_tree = scope_node
+        """Abstract select method to be implemented by subclasses."""
+        raise NotImplementedError
+
+
+class FunctionDefSelector(ScopedSelector):
+    def __init__(self, **kwargs: Any):
+        super().__init__(**kwargs)
+        self.name_to_find = kwargs.get("name")
+
+    def select(self, tree: ast.Module) -> list[ast.AST]:
+        search_tree = self._get_search_tree(tree)
+        if not search_tree:
+            return []
 
         found_nodes: list[ast.AST] = []
         for node in ast.walk(search_tree):
@@ -60,22 +43,19 @@ class FunctionDefSelector(Selector):
         return found_nodes
 
 
-class ClassDefSelector(Selector):
+class ClassDefSelector(ScopedSelector):
     """Selects class definition (class) nodes from an AST."""
 
     def __init__(self, **kwargs: Any):
         """Initializes the selector."""
+        super().__init__(**kwargs)
         self.name_to_find = kwargs.get("name")
-        self.in_scope_config = kwargs.get("in_scope")
 
     def select(self, tree: ast.Module) -> list[ast.AST]:
         """Finds all ast.ClassDef nodes that match the criteria."""
-        search_tree: ast.AST = tree
-        if self.in_scope_config and self.in_scope_config != "global":
-            scope_node = find_scope_node(tree, self.in_scope_config)
-            if not scope_node:
-                return []  # Если скоуп не найден, то и внутри него ничего нет
-            search_tree = scope_node
+        search_tree = self._get_search_tree(tree)
+        if not search_tree:
+            return []
 
         found_nodes: list[ast.AST] = []
         for node in ast.walk(search_tree):
@@ -85,65 +65,52 @@ class ClassDefSelector(Selector):
         return found_nodes
 
 
-class ImportStatementSelector(Selector):
+class ImportStatementSelector(ScopedSelector):
     """Selects import nodes (import or from...import) from an AST."""
 
     def __init__(self, **kwargs: Any):
-        """Initializes the selector.
-
-        Args:
-            **kwargs: Configuration, e.g., 'module_name'.
-        """
-        self.module_name_to_find = kwargs.get("module_name")
-        self.in_scope_config = kwargs.get("in_scope")
+        super().__init__(**kwargs)
+        self.module_name_to_find = kwargs.get("name")
 
     def select(self, tree: ast.Module) -> list[ast.AST]:
         """Finds all import-related nodes that match the criteria."""
         if not self.module_name_to_find:
             return []
 
-        search_tree: ast.AST = tree
-        if self.in_scope_config and self.in_scope_config != "global":
-            scope_node = find_scope_node(tree, self.in_scope_config)
-            if not scope_node:
-                return []  # Если скоуп не найден, то и внутри него ничего нет
-            search_tree = scope_node
+        search_tree = self._get_search_tree(tree)
+        if not search_tree:
+            return []
 
         found_nodes: list[ast.AST] = []
         for node in ast.walk(search_tree):
-            # Случай 1: import module1, module2
             if isinstance(node, ast.Import):
                 for alias in node.names:
-                    if alias.name == self.module_name_to_find:
+                    # Проверяем 'os' в 'import os.path'
+                    module_parts = alias.name.split(".")
+                    if alias.name.startswith(self.module_name_to_find) or self.module_name_to_find in module_parts:
                         found_nodes.append(node)
-                        break  # Достаточно одного совпадения на узел
-
-            # Случай 2: from package import module
+                        break
             elif isinstance(node, ast.ImportFrom):
-                # node.module может быть None для относительных импортов,
-                # например, `from . import utils`
-                if node.module and node.module == self.module_name_to_find:
+                if node.module and node.module.startswith(self.module_name_to_find):
                     found_nodes.append(node)
 
         return found_nodes
 
 
-class FunctionCallSelector(Selector):
+class FunctionCallSelector(ScopedSelector):
     """Selects function call nodes from an AST."""
 
     def __init__(self, **kwargs: Any):
         """Initializes the selector."""
+        super().__init__(**kwargs)
         self.name_to_find = kwargs.get("name")
-        self.in_scope_config = kwargs.get("in_scope")
 
     def select(self, tree: ast.Module) -> list[ast.AST]:
         """Finds all ast.Call nodes that match the criteria."""
-        search_tree: ast.AST = tree
-        if self.in_scope_config and self.in_scope_config != "global":
-            scope_node = find_scope_node(tree, self.in_scope_config)
-            if not scope_node:
-                return []  # Если скоуп не найден, то и внутри него ничего нет
-            search_tree = scope_node
+        search_tree = self._get_search_tree(tree)
+        if not search_tree:
+            return []
+
         found_nodes: list[ast.AST] = []
         for node in ast.walk(search_tree):
             if isinstance(node, ast.Call):
@@ -154,21 +121,19 @@ class FunctionCallSelector(Selector):
         return found_nodes
 
 
-class AssignmentSelector(Selector):
+class AssignmentSelector(ScopedSelector):
     """Selects assignment nodes (e.g., x = 5, self.y = 10)."""
 
     def __init__(self, **kwargs: Any):
-        self.target_name_to_find = kwargs.get("target_name")
-        self.in_scope_config = kwargs.get("in_scope")
+        super().__init__(**kwargs)
+        self.target_name_to_find = kwargs.get("name")
 
     def select(self, tree: ast.Module) -> list[ast.AST]:
         """Finds all ast.Assign or ast.AnnAssign nodes matching the target name."""
-        search_tree: ast.AST = tree
-        if self.in_scope_config and self.in_scope_config != "global":
-            scope_node = find_scope_node(tree, self.in_scope_config)
-            if not scope_node:
-                return []  # Если скоуп не найден, то и внутри него ничего нет
-            search_tree = scope_node
+        search_tree = self._get_search_tree(tree)
+        if not search_tree:
+            return []
+
         found_nodes: list[ast.AST] = []
         for node in ast.walk(search_tree):
             # Мы поддерживаем и простое присваивание (x=5), и с аннотацией (x: int = 5)
@@ -182,21 +147,19 @@ class AssignmentSelector(Selector):
         return found_nodes
 
 
-class UsageSelector(Selector):
+class UsageSelector(ScopedSelector):
     """Selects nodes where a variable or attribute is used (read)."""
 
     def __init__(self, **kwargs: Any):
-        self.variable_name_to_find = kwargs.get("variable_name")
-        self.in_scope_config = kwargs.get("in_scope")
+        super().__init__(**kwargs)
+        self.variable_name_to_find = kwargs.get("name")
 
     def select(self, tree: ast.Module) -> list[ast.AST]:
         """Finds all ast.Name nodes (in load context) matching the name."""
-        search_tree: ast.AST = tree
-        if self.in_scope_config and self.in_scope_config != "global":
-            scope_node = find_scope_node(tree, self.in_scope_config)
-            if not scope_node:
-                return []  # Если скоуп не найден, то и внутри него ничего нет
-            search_tree = scope_node
+        search_tree = self._get_search_tree(tree)
+        if not search_tree:
+            return []
+
         found_nodes: list[ast.AST] = []
         for node in ast.walk(search_tree):
             # Проверяем и простые имена, и атрибуты, когда их "читают"
@@ -207,36 +170,69 @@ class UsageSelector(Selector):
         return found_nodes
 
 
-class LiteralSelector(Selector):
-    """Selects literal nodes (ast.Constant) like numbers and strings."""
+class LiteralSelector(ScopedSelector):
+    """Selects literal nodes, attempting to ignore docstrings."""
 
     def __init__(self, **kwargs: Any):
-        """Initializes the selector."""
-        self.literal_type = kwargs.get("literal_type")  # "number" или "string"
-        self.in_scope_config = kwargs.get("in_scope")
+        super().__init__(**kwargs)
+        self.literal_type = kwargs.get("name")  # 'name' - это наш унифицированный ключ
 
     def select(self, tree: ast.Module) -> list[ast.AST]:
-        """Finds all ast.Constant nodes that match the type criteria."""
+        search_tree = self._get_search_tree(tree)
+        if not search_tree:
+            return []
 
-        type_map = {
-            "number": (int, float),
-            "string": (str,),
-        }
-
+        type_map = {"number": (int, float), "string": (str,)}
         expected_py_types = type_map.get(self.literal_type)
         if not expected_py_types:
-            return []  # Если тип литерала не задан или неверный, ничего не ищем
+            return []
 
-        search_tree: ast.AST = tree
-        if self.in_scope_config and self.in_scope_config != "global":
-            scope_node = find_scope_node(tree, self.in_scope_config)
-            if not scope_node:
-                return []  # Если скоуп не найден, то и внутри него ничего нет
-            search_tree = scope_node
         found_nodes: list[ast.AST] = []
         for node in ast.walk(search_tree):
-            # В Python 3.8+ все литералы, включая числа и строки, это ast.Constant
-            if isinstance(node, ast.Constant):
-                if isinstance(node.value, expected_py_types):
-                    found_nodes.append(node)
+            # Мы ищем только узлы Constant
+            if not isinstance(node, ast.Constant):
+                continue
+
+            # Проверяем тип значения внутри константы
+            if not isinstance(node.value, expected_py_types):
+                continue
+
+            # --- ЛОГИКА ИГНОРИРОВАНИЯ ДОКСТРИНГОВ ---
+            # Если у узла есть родитель и этот родитель - Expr,
+            # то велика вероятность, что это докстринг или "висячая" строка.
+            # Настоящие "магические" строки обычно являются аргументами функций
+            # или значениями в присваиваниях.
+            if hasattr(node, "parent") and isinstance(node.parent, ast.Expr):
+                continue  # Пропускаем этот узел, считая его докстрингом.
+
+            found_nodes.append(node)
+
+        return found_nodes
+
+
+class AstNodeSelector(ScopedSelector):
+    """Selects AST nodes directly by their class name (e.g., 'For', 'While')."""
+
+    def __init__(self, **kwargs: Any):
+        super().__init__(**kwargs)
+        node_type_arg = kwargs.get("node_type")
+
+        # Поддерживаем и одну строку, и список строк
+        if isinstance(node_type_arg, list):
+            self.node_types_to_find = tuple(getattr(ast, nt) for nt in node_type_arg if hasattr(ast, nt))
+        elif isinstance(node_type_arg, str) and hasattr(ast, node_type_arg):
+            self.node_types_to_find = (getattr(ast, node_type_arg),)
+        else:
+            self.node_types_to_find = ()
+
+    def select(self, tree: ast.Module) -> list[ast.AST]:
+        """Finds all AST nodes that are instances of the specified types."""
+        search_tree = self._get_search_tree(tree)
+        if not search_tree or not self.node_types_to_find:
+            return []
+
+        found_nodes: list[ast.AST] = []
+        for node in ast.walk(search_tree):
+            if isinstance(node, self.node_types_to_find):
+                found_nodes.append(node)
         return found_nodes

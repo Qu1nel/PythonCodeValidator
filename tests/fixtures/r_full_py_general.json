@@ -1,0 +1,179 @@
+{
+  "description": "Полный набор правил для базовой Python программы.",
+  "validation_rules": [
+    {
+      "rule_id": 1,
+      "type": "check_syntax",
+      "message": "Синтаксическая ошибка."
+    },
+    {
+      "rule_id": 2,
+      "type": "check_linter_pep8",
+      "message": "Нарушение PEP8."
+    },
+    {
+      "rule_id": 10,
+      "message": "Необходимо импортировать модуль 'sys'.",
+      "check": {
+        "selector": {
+          "type": "import_statement",
+          "name": "sys"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 11,
+      "message": "Запрещено импортировать модуль 'os'.",
+      "check": {
+        "selector": {
+          "type": "import_statement",
+          "name": "os"
+        },
+        "constraint": {
+          "type": "is_forbidden"
+        }
+      }
+    },
+    {
+      "rule_id": 20,
+      "message": "Должна быть определена глобальная константа 'GLOBAL_CONST'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "GLOBAL_CONST",
+          "in_scope": "global"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 21,
+      "message": "Константа 'GLOBAL_CONST' должна быть строкой.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "GLOBAL_CONST"
+        },
+        "constraint": {
+          "type": "must_be_type",
+          "expected_type": "str"
+        }
+      }
+    },
+    {
+      "rule_id": 30,
+      "message": "Должна быть определена функция 'solve'.",
+      "check": {
+        "selector": {
+          "type": "function_def",
+          "name": "solve"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 31,
+      "message": "Функция 'solve' не должна принимать аргументов.",
+      "check": {
+        "selector": {
+          "type": "function_def",
+          "name": "solve"
+        },
+        "constraint": {
+          "type": "must_have_args",
+          "count": 0
+        }
+      }
+    },
+    {
+      "rule_id": 32,
+      "message": "Внутри функции 'solve' должен использоваться вызов 'print'.",
+      "check": {
+        "selector": {
+          "type": "function_call",
+          "name": "print",
+          "in_scope": {
+            "function": "solve"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 40,
+      "message": "Должна быть точка входа if __name__ == '__main__'.",
+      "check": {
+        "selector": {
+          "type": "ast_node",
+          "node_type": "If"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 41,
+      "message": "Внутри точки входа должна вызываться функция 'main'.",
+      "check": {
+        "selector": {
+          "type": "function_call",
+          "name": "main",
+          "in_scope": "global"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 50,
+      "message": "В коде не должно быть 'магических чисел', кроме 10.",
+      "check": {
+        "selector": {
+          "type": "literal",
+          "name": "number",
+          "in_scope": {
+            "function": "*"
+          }
+        },
+        "constraint": {
+          "type": "value_must_be_in",
+          "allowed_values": [
+            12
+          ]
+        }
+      }
+    },
+    {
+      "rule_id": 51,
+      "message": "В коде не должно быть 'магических строк', кроме разрешенных.",
+      "check": {
+        "selector": {
+          "type": "literal",
+          "name": "string",
+          "in_scope": {
+            "function": "*"
+          }
+        },
+        "constraint": {
+          "type": "value_must_be_in",
+          "allowed_values": [
+            "__main__",
+            "OK",
+            "ALLOWED"
+          ]
+        }
+      }
+    }
+  ]
+}

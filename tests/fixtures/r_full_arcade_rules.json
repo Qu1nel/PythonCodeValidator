@@ -1,0 +1,38 @@
+{
+  "description": "Полный набор правил для задачи на Arcade.",
+  "validation_rules": [
+    { "rule_id": 1, "type": "check_syntax", "message": "Синтаксическая ошибка." },
+    { "rule_id": 10, "message": "Необходимо импортировать 'arcade'.",
+      "check": {"selector": {"type": "import_statement", "name": "arcade"}, "constraint": {"type": "is_required"}}
+    },
+    {
+      "rule_id": 20, "message": "Должен быть определен класс 'MyArcadeGame'.",
+      "check": {"selector": {"type": "class_def", "name": "MyArcadeGame"}, "constraint": {"type": "is_required"}}
+    },
+    {
+      "rule_id": 21, "message": "Класс 'MyArcadeGame' должен наследоваться от 'arcade.Window'.",
+      "check": {
+        "selector": {"type": "class_def", "name": "MyArcadeGame"},
+        "constraint": {"type": "must_inherit_from", "parent_name": "arcade.Window"}
+      }
+    },
+    {
+      "rule_id": 30, "message": "Должна быть определена функция 'setup_game'.",
+      "check": {"selector": {"type": "function_def", "name": "setup_game"}, "constraint": {"type": "is_required"}}
+    },
+    {
+      "rule_id": 31, "message": "Функция 'setup_game' должна возвращать экземпляр 'MyArcadeGame'.",
+      "check": {
+        "selector": {"type": "return_statement", "in_scope": {"function": "setup_game"}},
+        "constraint": {"type": "must_return_call_of", "function_name": "MyArcadeGame"}
+      }
+    },
+    {
+      "rule_id": 40, "message": "В методе 'on_draw' должен быть вызов 'arcade.draw_circle_filled'.",
+      "check": {
+        "selector": {"type": "function_call", "name": "arcade.draw_circle_filled", "in_scope": {"class": "MyArcadeGame", "method": "on_draw"}},
+        "constraint": {"type": "is_required"}
+      }
+    }
+  ]
+}

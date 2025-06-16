@@ -1,0 +1,126 @@
+{
+  "description": "Полный набор правил для задачи на API.",
+  "validation_rules": [
+    {
+      "rule_id": 1,
+      "type": "check_syntax",
+      "message": "Синтаксическая ошибка."
+    },
+    {
+      "rule_id": 10,
+      "message": "Требуется импорт 'requests'.",
+      "check": {
+        "selector": {
+          "type": "import_statement",
+          "name": "requests"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 20,
+      "message": "Константа 'API_KEY' должна быть определена.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "API_KEY"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 21,
+      "message": "Константа 'BASE_URL' должна быть определена.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "BASE_URL"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 30,
+      "message": "Должна быть функция 'get_weather'.",
+      "check": {
+        "selector": {
+          "type": "function_def",
+          "name": "get_weather"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 32,
+      "message": "Функция 'get_weather' должна принимать один аргумент 'city'.",
+      "check": {
+        "selector": {
+          "type": "function_def",
+          "name": "get_weather"
+        },
+        "constraint": {
+          "type": "must_have_args",
+          "names": [
+            "city"
+          ]
+        }
+      }
+    },
+    {
+      "rule_id": 40,
+      "message": "Внутри 'get_weather' должен быть вызов 'requests.get'.",
+      "check": {
+        "selector": {
+          "type": "function_call",
+          "name": "requests.get",
+          "in_scope": {
+            "function": "get_weather"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 41,
+      "message": "Внутри 'get_weather' должен быть блок try...except.",
+      "check": {
+        "selector": {
+          "type": "ast_node",
+          "node_type": "Try",
+          "in_scope": {
+            "function": "get_weather"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 42,
+      "message": "Внутри 'get_weather' должен обрабатываться атрибут 'status_code'.",
+      "check": {
+        "selector": {
+          "type": "usage",
+          "name": "response.status_code",
+          "in_scope": {
+            "function": "get_weather"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    }
+  ]
+}
