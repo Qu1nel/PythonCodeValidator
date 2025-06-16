@@ -13,39 +13,37 @@ jobs:
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest ]
-        python-version: [ "3.11" ]
+        python-version: [ "3.11", "3.12" ]
 
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
 
-      # 1. Настройка Python
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 
-      # 2. Установка uv
-      - name: Install uv
-        run: pip install uv
-
-      # 3. Создание venv и установка зависимостей
-      - name: Create venv and install dependencies
+      - name: Install uv and dependencies
         run: |
+          pip install uv
           uv venv
           uv pip install -e ".[dev]"
 
-      # 4. Запуск проверок (единый шаг для всех ОС)
-      - name: Run Linting and Tests
-        run: |
-          echo "--- Running Lint and Format Check ---"
-          uv run ruff check src/ tests/
-          uv run ruff format --check src/ tests/
-          
-          echo "--- Running Tests with Coverage ---"
-          uv run coverage run -m unittest discover tests
+      - name: Run linting and formatting check
+        run: .venv/bin/python -m ruff check src/ tests/ && .venv/bin/python -m ruff format --check src/ tests/
+        if: runner.os != 'Windows'
+      - name: Run linting and formatting check (Windows)
+        run: .\.venv\Scripts\python.exe -m ruff check src/ tests/ ; .\.venv\Scripts\python.exe -m ruff format --check src/ tests/
+        if: runner.os == 'Windows'
 
-      # 5. Загрузка отчета
+      - name: Run tests and generate coverage report
+        run: .venv/bin/python -m coverage run -m unittest discover tests
+        if: runner.os != 'Windows'
+      - name: Run tests and generate coverage report (Windows)
+        run: .\.venv\Scripts\python.exe -m coverage run -m unittest discover tests
+        if: runner.os == 'Windows'
+
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4
         with:
