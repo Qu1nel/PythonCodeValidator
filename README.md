@@ -70,16 +70,21 @@ reliable way to enforce best practices.
 
 ## 📈 The Power of Combinatorics
 
-The framework's power lies in its combinatorial architecture. It is built on a small set of primitive "bricks": *
-*Selectors** (`S`) that define *what* to find in the code, and **Constraints** (`C`) that define *what condition* to
+The framework's power lies in its combinatorial architecture. It is built on a small set of primitive "bricks":
+**Selectors** ($S$) that define *what* to find in the code, and **Constraints** ($C$) that define *what condition* to
 check.
 
-The number of unique validation rules (`R`) is not a sum, but a product of these components. A single rule can be
+The number of unique validation rules ($R$) is not a sum, but a product of these components. A single rule can be
 represented as:
-$$ R_{\text{single}} = S \times C $$
-With approximately 10 types of selectors and 10 types of constraints, this already provides ~100 unique checks. However,
+
+$$R_{\text{single}} = S \times C$$
+
+With approximately $10$ types of selectors and $10$ types of constraints, this already provides ~$100$ unique checks.
+However,
 the true flexibility comes from logical composition, allowing for a near-infinite number of validation scenarios:
-$$ R_{\text{total}} \approx S \times \sum_{k=1}^{|C|} \binom{|C|}{k} = S \times (2^{|C|} - 1) $$
+
+$$R_{\text{total}} \approx S \times \sum_{k=1}^{|C|} \binom{|C|}{k} = S \times (2^{|C|} - 1)$$
+
 This design provides **thousands of potential validation scenarios** out-of-the-box, offering extreme flexibility with
 minimal complexity.
 
