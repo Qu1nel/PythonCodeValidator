@@ -58,14 +58,14 @@ jobs:
         shell: pwsh
         if: runner.os == 'Windows'
         run: |
-          .venv\Scripts\Activate.ps1
+          .\.venv\Scripts\activate.ps1 
           
           echo "--- Running Lint and Format Check ---"
-          ruff check src/ tests/
-          ruff format --check src/ tests/
+          uv run python -m ruff check src/ tests/
+          uv run python -m ruff format --check src/ tests/
           
           echo "--- Running Tests with Coverage ---"
-          coverage run -m unittest discover tests
+          uv run python -m coverage run -m unittest discover tests
 
       # Load report
       - name: Upload coverage reports to Codecov
