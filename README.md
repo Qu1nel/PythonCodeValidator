@@ -9,17 +9,17 @@
 
   <!-- Badges -->
   <p>
-    <a href="https://github.com/Qu1nel/PythonCodeValidator/stargazers"><img src="https://img.shields.io/github/stars/Qu1nel/PythonCodeValidator?style=flat-square" alt="GitHub Stars"></a>
-    <a href="https://github.com/Qu1nel/PythonCodeValidator/network/members"><img src="https://img.shields.io/github/forks/Qu1nel/PythonCodeValidator?style=flat-square" alt="GitHub Forks"></a>
-    <a href="https://github.com/Qu1nel/PythonCodeValidator/graphs/contributors"><img src="https://img.shields.io/github/contributors/Qu1nel/PythonCodeValidator?style=flat-square" alt="Contributors"></a>
-    <a href="https://github.com/Qu1nel/PythonCodeValidator/issues/"><img src="https://img.shields.io/github/issues/Qu1nel/PythonCodeValidator?style=flat-square" alt="Open Issues"></a>
-    <a href="https://github.com/Qu1nel/PythonCodeValidator/commits/main"><img src="https://img.shields.io/github/last-commit/Qu1nel/PythonCodeValidator?style=flat-square" alt="Last Commit"></a>
+    <a href="https://github.com/Qu1nel/PythonCodeValidator/stargazers"><img src="https://img.shields.io/github/stars/Qu1nel/PythonCodeValidator" alt="GitHub Stars"></a>
+    <a href="https://github.com/Qu1nel/PythonCodeValidator/network/members"><img src="https://img.shields.io/github/forks/Qu1nel/PythonCodeValidator" alt="GitHub Forks"></a>
+    <a href="https://github.com/Qu1nel/PythonCodeValidator/graphs/contributors"><img src="https://img.shields.io/github/contributors/Qu1nel/PythonCodeValidator" alt="Contributors"></a>
+    <a href="https://github.com/Qu1nel/PythonCodeValidator/issues/"><img src="https://img.shields.io/github/issues/Qu1nel/PythonCodeValidator" alt="Open Issues"></a>
+    <a href="https://github.com/Qu1nel/PythonCodeValidator/commits/main"><img src="https://img.shields.io/github/last-commit/Qu1nel/PythonCodeValidator" alt="Last Commit"></a>
   </p>
   <p>
     <a href="https://github.com/Qu1nel/PythonCodeValidator/actions/workflows/ci.yml"><img src="https://github.com/Qu1nel/PythonCodeValidator/actions/workflows/ci.yml/badge.svg" alt="CI Status"></a>
     <a href="https://app.codecov.io/gh/Qu1nel/PythonCodeValidator"><img src="https://codecov.io/gh/Qu1nel/PythonCodeValidator/graph/badge.svg" alt="Coverage"></a>
-    <a href="https://pypi.org/project/python-code-validator/"><img src="https://img.shields.io/pypi/v/python-code-validator.svg?style=flat-square" alt="PyPI Version"></a>
-    <a href="https://pypi.org/project/python-code-validator/"><img src="https://img.shields.io/pypi/pyversions/python-code-validator.svg?style=flat-square" alt="Python Versions"></a>
+    <a href="https://pypi.org/project/python-code-validator/"><img src="https://img.shields.io/pypi/v/python-code-validator.svg" alt="PyPI Version"></a>
+    <a href="https://pypi.org/project/python-code-validator/"><img src="https://img.shields.io/pypi/pyversions/python-code-validator.svg" alt="Python Versions"></a>
     <a href="https://github.com/Qu1nel/PythonCodeValidator/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Qu1nel/PythonCodeValidator" alt="License"></a>
   </p>
 
