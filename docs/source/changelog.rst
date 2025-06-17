@@ -14,14 +14,48 @@ Unreleased
 
 *This section is for upcoming changes. It will become the next version's release notes.*
 
-**Added**
-- *... (e.g., Added `must_have_docstring` constraint)*
+Added
+-----
 
-**Changed**
 - *...*
 
-**Fixed**
+Changed
+-------
+
 - *...*
+
+Fixed
+-----
+
+- *...*
+
+
+----
+
+v0.1.3 - 2025-06-17
+===================
+
+Patch changes, fixes, and improvements.
+
+Fixed
+-----
+
+- **Logging level**: Wherever the level was specified as a string, the LogLevel structure is used.
+- **Clean code**: Delete unnecessary comments from code.
+- **Docstring**: Update all docstring in all files.
+
+
+
+v0.1.2 - 2025-06-17
+===================
+
+A little code refinement.
+
+Changed
+-------
+
+- **Typo**: Fix `README.md`: add links and clean file.
+
 
 
 v0.1.1 - 2025-06-17
@@ -35,7 +69,7 @@ The documentation for ReadTheDocs has been written and the book How It Works has
 - **How It Works**: How It Works in `docs/how_it_works/index.md`.
 - **AI in repository**: Deep wiki by `https://deepwiki.com/Qu1nel/PythonCodeValidator`
 
-.. _v0.1.0:
+
 
 v0.1.0 - 2025-06-16
 ===================
