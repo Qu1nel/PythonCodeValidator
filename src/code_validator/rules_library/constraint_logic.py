@@ -2,7 +2,11 @@
 
 Each class in this module implements the `Constraint` protocol and encapsulates
 the logic for a specific condition that can be checked against a list of
-AST nodes found by a Selector.
+AST nodes. These classes are instantiated by the `ConstraintFactory` based on
+the "constraint" block in a JSON rule.
+
+The module also includes helper functions for processing AST nodes, which are
+used internally by the constraint classes.
 """
 
 import ast
@@ -66,6 +70,12 @@ class MustInheritFromConstraint(Constraint):
     """
 
     def __init__(self, **kwargs: Any):
+        """Initializes the constraint.
+
+        Args:
+            **kwargs: Keyword arguments from the JSON rule's constraint config.
+                Expects `parent_name` (str) specifying the required parent class.
+        """
         self.parent_name_to_find: str | None = kwargs.get("parent_name")
 
     def check(self, nodes: list[ast.AST]) -> bool:
@@ -105,6 +115,12 @@ class MustBeTypeConstraint(Constraint):
     """
 
     def __init__(self, **kwargs: Any):
+        """Initializes the constraint.
+
+        Args:
+            **kwargs: Keyword arguments from the JSON rule's constraint config.
+                Expects `expected_type` (str) with the name of the required type.
+        """
         self.expected_type_str: str | None = kwargs.get("expected_type")
         self.type_map = {
             "str": str,
@@ -164,6 +180,12 @@ class NameMustBeInConstraint(Constraint):
     """
 
     def __init__(self, **kwargs: Any):
+        """Initializes the constraint.
+
+        Args:
+            **kwargs: Keyword arguments from the JSON rule's constraint config.
+                Expects `allowed_names` (list[str]) containing the valid names.
+        """
         self.allowed_names = set(kwargs.get("allowed_names", []))
 
     @staticmethod
@@ -194,6 +216,12 @@ class ValueMustBeInConstraint(Constraint):
     """
 
     def __init__(self, **kwargs: Any):
+        """Initializes the constraint.
+
+        Args:
+            **kwargs: Keyword arguments from the JSON rule's constraint config.
+                Expects `allowed_values` (list) containing the valid literal values.
+        """
         self.allowed_values = set(kwargs.get("allowed_values", []))
 
     def check(self, nodes: list[ast.AST]) -> bool:
@@ -224,6 +252,13 @@ class MustHaveArgsConstraint(Constraint):
     """
 
     def __init__(self, **kwargs: Any):
+        """Initializes the constraint.
+
+        Args:
+            **kwargs: Keyword arguments from the JSON rule's constraint config.
+                Can accept `count` (int), `names` (list[str]), and
+                `exact_match` (bool).
+        """
         self.expected_count: int | None = kwargs.get("count")
         self.expected_names: list[str] | None = kwargs.get("names")
         self.exact_match: bool = kwargs.get("exact_match", True)

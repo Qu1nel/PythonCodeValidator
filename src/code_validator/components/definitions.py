@@ -1,10 +1,11 @@
-"""Defines the core component interfaces using Protocols.
+"""Defines the core component interfaces for the validator using Protocols.
 
 This module establishes the fundamental "contracts" for the main architectural
-components of the validator: Rules, Selectors, and Constraints. By using
-Protocols, we ensure that any class conforming to these interfaces can be used
-interchangeably by the system's factories and core engine, enabling a flexible
-and decoupled plugin-style architecture.
+components: Rules, Selectors, and Constraints. By using `typing.Protocol`, we
+ensure that any class conforming to these interfaces can be used interchangeably
+by the system's factories and core engine. This enables a flexible and
+decoupled plugin-style architecture, where new components can be added without
+modifying the core logic.
 """
 
 import ast

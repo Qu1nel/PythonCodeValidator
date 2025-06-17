@@ -1,9 +1,10 @@
 """Contains factories for creating rule, selector, and constraint objects.
 
 This module implements the Factory Method design pattern to decouple the core
-validator engine from the concrete implementation of rules. Factories are
-responsible for parsing raw dictionary configurations from JSON and instantiating
-the appropriate handler classes.
+validator engine from the concrete implementations of its components. Factories
+are responsible for parsing raw dictionary configurations from the main JSON
+rules file and instantiating the appropriate handler classes from the
+`rules_library`.
 """
 
 import dataclasses

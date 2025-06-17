@@ -1,8 +1,10 @@
 """Contains concrete implementations of executable validation rules.
 
 This module defines the handler classes for both "short" (pre-defined) and
-"full" (custom selector/constraint) rules. Each class implements the `Rule`
-protocol and encapsulates the logic for a specific type of validation check.
+"full" (custom selector/constraint) rules. Each class in this module implements
+the `Rule` protocol from `definitions.py` and encapsulates the logic for a
+specific type of validation check. The `RuleFactory` uses these classes to
+instantiate the correct handler for each rule defined in a JSON file.
 """
 
 import ast
@@ -103,8 +105,9 @@ class CheckLinterRule(Rule):
                 self._console.print(f"Flake8 found issues:\n{linter_output}", level=LogLevel.DEBUG)
                 return False
             elif process.returncode != 0:
-                self._console.print(f"Flake8 exited with code {process.returncode}:\n{process.stderr}",
-                                    level=LogLevel.ERROR)
+                self._console.print(
+                    f"Flake8 exited with code {process.returncode}:\n{process.stderr}", level=LogLevel.ERROR
+                )
                 return False
 
             self._console.print("PEP8 check passed.", level=LogLevel.ERROR)

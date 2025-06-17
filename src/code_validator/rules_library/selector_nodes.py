@@ -3,7 +3,8 @@
 Each class in this module implements the `Selector` protocol and is responsible
 for finding and returning specific types of nodes from an Abstract Syntax Tree.
 They use `ast.walk` to traverse the tree and can be constrained to specific
-scopes using the ScopedSelector base class.
+scopes via the `ScopedSelector` base class, which uses the `scope_handler`.
+These classes are instantiated by the `SelectorFactory`.
 """
 
 import ast
@@ -27,11 +28,11 @@ class ScopedSelector(Selector):
     """
 
     def __init__(self, **kwargs: Any):
-        """Initializes the ScopedSelector.
+        """Initializes the ScopedSelector base class.
 
         Args:
-            **kwargs: Keyword arguments containing the scope configuration.
-                Expects `in_scope` key.
+            **kwargs: Keyword arguments passed from a subclass constructor.
+                It extracts the `in_scope` configuration.
         """
         self.in_scope_config = kwargs.get("in_scope")
 
@@ -67,6 +68,12 @@ class FunctionDefSelector(ScopedSelector):
     """
 
     def __init__(self, **kwargs: Any):
+        """Initializes the FunctionDefSelector.
+
+        Args:
+            **kwargs: Keyword arguments from the JSON rule's selector config.
+                Expects `name` (str) and optionally `in_scope` (dict).
+        """
         super().__init__(**kwargs)
         self.name_to_find = kwargs.get("name")
 
@@ -118,6 +125,12 @@ class ImportStatementSelector(ScopedSelector):
     """
 
     def __init__(self, **kwargs: Any):
+        """Initializes the ImportStatementSelector.
+
+        Args:
+            **kwargs: Keyword arguments from the JSON rule's selector config.
+                Expects `name` (str) for the module name and optionally `in_scope`.
+        """
         super().__init__(**kwargs)
         self.module_name_to_find = kwargs.get("name")
 
@@ -188,6 +201,12 @@ class AssignmentSelector(ScopedSelector):
     """
 
     def __init__(self, **kwargs: Any):
+        """Initializes the AssignmentSelector.
+
+        Args:
+            **kwargs: Keyword arguments from the JSON rule's selector config.
+                Expects `name` (str) for the assignment target and optionally `in_scope`.
+        """
         super().__init__(**kwargs)
         self.target_name_to_find = kwargs.get("name")
 
@@ -221,6 +240,13 @@ class UsageSelector(ScopedSelector):
     """
 
     def __init__(self, **kwargs: Any):
+        """Initializes the UsageSelector.
+
+        Args:
+            **kwargs: Keyword arguments from the JSON rule's selector config.
+                Expects `name` (str) for the variable/attribute being used and
+                optionally `in_scope`.
+        """
         super().__init__(**kwargs)
         self.variable_name_to_find = kwargs.get("name")
 
@@ -248,10 +274,30 @@ class LiteralSelector(ScopedSelector):
     """
 
     def __init__(self, **kwargs: Any):
+        """Initializes the LiteralSelector.
+
+        Args:
+            **kwargs: Keyword arguments from the JSON rule's selector config.
+                Expects `name` (str) to be "string" or "number" and optionally
+                `in_scope`.
+        """
         super().__init__(**kwargs)
-        self.literal_type = kwargs.get("name")  # 'name' - это наш унифицированный ключ
+        self.literal_type = kwargs.get("name")
 
     def select(self, tree: ast.Module) -> list[ast.AST]:
+        """Finds all ast.Constant nodes that match the type criteria.
+
+        This method traverses the given AST (or a sub-tree defined by `in_scope`)
+        and collects all number or string literals. It contains special logic
+        to intelligently ignore nodes that are likely to be docstrings or parts
+        of f-strings to avoid false positives.
+
+        Args:
+            tree: The root of the AST (the module object) to be searched.
+
+        Returns:
+            A list of `ast.Constant` nodes matching the criteria.
+        """
         search_tree = self._get_search_tree(tree)
         if not search_tree:
             return []
@@ -295,6 +341,12 @@ class AstNodeSelector(ScopedSelector):
     """
 
     def __init__(self, **kwargs: Any):
+        """Initializes the AstNodeSelector.
+
+        Args:
+            **kwargs: Keyword arguments from the JSON rule's selector config.
+                Expects `node_type` (str or list[str]) and optionally `in_scope`.
+        """
         super().__init__(**kwargs)
         node_type_arg = kwargs.get("node_type")
 

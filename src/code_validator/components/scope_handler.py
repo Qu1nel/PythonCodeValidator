@@ -1,8 +1,10 @@
 """Provides functionality to find and isolate specific scopes within an AST.
 
-This module contains helper functions that are used by ScopedSelectors to narrow
-down their search area from the entire module to a specific function, class,
-or method, based on the `in_scope` configuration from a JSON rule.
+This module contains a key helper function, `find_scope_node`, which is used
+by `ScopedSelector` instances. Its purpose is to traverse the AST and return
+a specific subtree (e.g., a function body or class body) based on the
+`in_scope` configuration from a JSON rule. This allows rules to be applied
+with high precision to specific parts of the source code.
 """
 
 import ast

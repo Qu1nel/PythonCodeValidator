@@ -1,4 +1,9 @@
-"""Provides utility functions for working with Python's Abstract Syntax Trees (AST)."""
+"""Provides utility functions for working with Python's Abstract Syntax Trees (AST).
+
+This module contains helper functions that perform common operations on AST nodes,
+such as enriching the tree with parent references. These utilities are used by
+various components of the validator to simplify complex tree analysis.
+"""
 
 import ast
 

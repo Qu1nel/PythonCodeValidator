@@ -2,7 +2,11 @@
 
 This module is responsible for parsing command-line arguments, setting up the
 application configuration, and orchestrating the main validation workflow. It acts
-as the primary entry point for user interaction.
+as the primary entry point for user interaction when the tool is called from
+the terminal.
+
+The main function, `run_from_cli`, handles the entire application lifecycle,
+including robust top-level error handling to ensure meaningful exit codes.
 """
 
 import argparse
@@ -19,8 +23,13 @@ from .output import Console, setup_logging
 def setup_arg_parser() -> argparse.ArgumentParser:
     """Creates and configures the argument parser for the CLI.
 
+    This function defines all positional and optional arguments that the
+    `validate-code` command accepts, including their types, help messages,
+    and default values.
+
     Returns:
-        An instance of argparse.ArgumentParser with all arguments defined.
+        argparse.ArgumentParser: A fully configured parser instance ready to
+            process command-line arguments.
     """
     parser = argparse.ArgumentParser(
         prog="validate-code",
@@ -32,7 +41,7 @@ def setup_arg_parser() -> argparse.ArgumentParser:
         "-l",
         "--log-level",
         type=LogLevel,
-        choices=LogLevel,
+        choices=list(LogLevel),
         default=LogLevel.WARNING,
         help="Set the logging level (default: WARNING).",
     )
@@ -45,14 +54,20 @@ def setup_arg_parser() -> argparse.ArgumentParser:
 def run_from_cli() -> None:
     """Runs the full application lifecycle from the command line.
 
-    This function parses arguments, initializes logging and configuration,
-    runs the validator, and handles all top-level exceptions, exiting with an
-    appropriate exit code.
+    This is the main entry point for the `validate-code` script. It performs
+    the following steps:
+    1. Parses command-line arguments.
+    2. Initializes the logger, console, and configuration.
+    3. Instantiates and runs the `StaticValidator`.
+    4. Handles all top-level exceptions and exits with an appropriate status code.
+
+    Raises:
+        SystemExit: This function will always terminate the process with an
+            exit code defined in the `ExitCode` enum.
     """
     parser = setup_arg_parser()
     args = parser.parse_args()
 
-    # 1. Setup environment
     logger = setup_logging(args.log_level)
     console = Console(logger, is_silent=args.silent)
     config = AppConfig(
@@ -63,7 +78,6 @@ def run_from_cli() -> None:
         stop_on_first_fail=args.stop_on_first_fail,
     )
 
-    # 2. Run main logic with robust error handling
     try:
         console.print(f"Starting validation for: {config.solution_path}", level=LogLevel.INFO)
         validator = StaticValidator(config, console)

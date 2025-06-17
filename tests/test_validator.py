@@ -219,7 +219,6 @@ class TestStaticValidatorIntegration(unittest.TestCase):
 
     def test_full_rule_sets(self):
         """Runs all comprehensive rule sets against their corresponding code files."""
-
         test_cases = [
             # Название теста, файл с кодом, файл с правилами, ожидаемый результат (True=pass)
             ("debug_pep8_valid", "p01_simple_program.py", "debug_pep8.json", True),
