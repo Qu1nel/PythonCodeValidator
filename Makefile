@@ -26,7 +26,7 @@ TWINE_RUNNER    := $(PYTHON_RUNNER) -m twine
 setup: ## Install all dependencies for development. Ex: make setup
 	@echo "$(CYAN)› Setting up virtual environment and installing dependencies...$(RESET)"
 	@uv venv -p 3.11
-	@uv pip install -e ".[dev]"
+	@uv pip install -e ".[dev,docs]"
 	@echo "$(GREEN)✅ Setup complete. Activate with 'source .venv/bin/activate' or '.venv\\Scripts\\activate'.$(RESET)"
 
 .PHONY: sync
