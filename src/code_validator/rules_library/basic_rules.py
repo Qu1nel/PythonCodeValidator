@@ -1,5 +1,3 @@
-# src/code_validator/rules_library/basic_rules.py
-
 """Contains concrete implementations of executable validation rules.
 
 This module defines the handler classes for both "short" (pre-defined) and
@@ -77,10 +75,10 @@ class CheckLinterRule(Rule):
             True if no PEP8 violations are found, False otherwise.
         """
         if not source_code:
-            self._console.print("Source code is empty, skipping PEP8 check.", level="WARNING")
+            self._console.print("Source code is empty, skipping PEP8 check.", level=LogLevel.WARNING)
             return True
 
-        self._console.print(f"Rule {self.config.rule_id}: Running flake8 linter...", level="DEBUG")
+        self._console.print(f"Rule {self.config.rule_id}: Running flake8 linter...", level=LogLevel.DEBUG)
 
         params = self.config.params
         args = [sys.executable, "-m", "flake8", "-"]
@@ -102,19 +100,20 @@ class CheckLinterRule(Rule):
 
             if process.returncode != 0 and process.stdout:
                 linter_output = process.stdout.strip()
-                self._console.print(f"Flake8 found issues:\n{linter_output}", level="DEBUG")
+                self._console.print(f"Flake8 found issues:\n{linter_output}", level=LogLevel.DEBUG)
                 return False
             elif process.returncode != 0:
-                self._console.print(f"Flake8 exited with code {process.returncode}:\n{process.stderr}", level="ERROR")
+                self._console.print(f"Flake8 exited with code {process.returncode}:\n{process.stderr}",
+                                    level=LogLevel.ERROR)
                 return False
 
-            self._console.print("PEP8 check passed.", level="DEBUG")
+            self._console.print("PEP8 check passed.", level=LogLevel.ERROR)
             return True
         except FileNotFoundError:
-            self._console.print("flake8 not found. Is it installed in the venv?", level="CRITICAL")
+            self._console.print("flake8 not found. Is it installed in the venv?", level=LogLevel.CRITICAL)
             return False
         except Exception as e:
-            self._console.print(f"An unexpected error occurred while running flake8: {e}", level="CRITICAL")
+            self._console.print(f"An unexpected error occurred while running flake8: {e}", level=LogLevel.CRITICAL)
             return False
 
 
@@ -157,11 +156,11 @@ class FullRuleHandler(Rule):
             The boolean result of applying the constraint to the selected nodes.
         """
         if not tree:
-            self._console.print("AST not available, skipping rule.", level="WARNING")
+            self._console.print("AST not available, skipping rule.", level=LogLevel.WARNING)
             return True
 
-        self._console.print(f"Applying selector: {self._selector.__class__.__name__}", level="DEBUG")
+        self._console.print(f"Applying selector: {self._selector.__class__.__name__}", level=LogLevel.DEBUG)
         selected_nodes = self._selector.select(tree)
 
-        self._console.print(f"Applying constraint: {self._constraint.__class__.__name__}", level="DEBUG")
+        self._console.print(f"Applying constraint: {self._constraint.__class__.__name__}", level=LogLevel.DEBUG)
         return self._constraint.check(selected_nodes)

@@ -15,7 +15,6 @@ def enrich_ast_with_parents(tree: ast.Module) -> None:
     """
     for node in ast.walk(tree):
         for child in ast.iter_child_nodes(node):
-            # Dynamically add a reference to the parent node.
             child.parent = node
 
 

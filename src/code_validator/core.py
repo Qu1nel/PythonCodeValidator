@@ -45,14 +45,12 @@ class StaticValidator:
             enrich_ast_with_parents(self._ast_tree)
             return True
         except SyntaxError as e:
-            # Ищем правило check_syntax, чтобы вывести его кастомное сообщение
             for rule in self._validation_rules:
                 if getattr(rule.config, "type", None) == "check_syntax":
-                    self._console.print(rule.config.message, level="ERROR")
+                    self._console.print(rule.config.message, level=LogLevel.ERROR)
                     self._failed_rules.append(rule.config.rule_id)
                     return False
-            # Если такого правила нет, выводим стандартное сообщение
-            self._console.print(f"Syntax Error found: {e}", level="ERROR")
+            self._console.print(f"Syntax Error found: {e}", level=LogLevel.ERROR)
             return False
 
     def _load_and_parse_rules(self) -> None:
@@ -75,7 +73,7 @@ class StaticValidator:
         """Runs the entire validation process."""
         try:
             self._load_source_code()
-            self._load_and_parse_rules()  # Загружаем правила до парсинга AST
+            self._load_and_parse_rules()
 
             if not self._parse_ast_tree():
                 return False
@@ -84,17 +82,16 @@ class StaticValidator:
             raise
 
         for rule in self._validation_rules:
-            # check_syntax уже обработан в _parse_ast_tree, пропускаем его
             if getattr(rule.config, "type", None) == "check_syntax":
                 continue
 
             self._console.print(f"Executing rule: {rule.config.rule_id}", level=LogLevel.DEBUG)
             is_passed = rule.execute(self._ast_tree, self._source_code)
             if not is_passed:
-                self._console.print(rule.config.message, level="ERROR")
+                self._console.print(rule.config.message, level=LogLevel.ERROR)
                 self._failed_rules.append(rule.config.rule_id)
                 if getattr(rule.config, "is_critical", False) or self._config.stop_on_first_fail:
-                    self._console.print("Critical rule failed. Halting validation.", level="WARNING")
+                    self._console.print("Critical rule failed. Halting validation.", level=LogLevel.WARNING)
                     break
 
         return not self._failed_rules
