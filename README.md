@@ -28,7 +28,7 @@
     <span>·</span>
     <a href="https://pythoncodevalidator.readthedocs.io/en/latest/">Full Documentation</a>
     <span>·</span>
-    <a href="deepwiki.com/Qu1nel/PythonCodeValidator">AI documentation</a>
+    <a href="https://deepwiki.com/Qu1nel/PythonCodeValidator">AI documentation</a>
     <span>·</span>
     <a href="https://github.com/Qu1nel/PythonCodeValidator/blob/main/docs/how_it_works/index.md">Developer's Guide</a>
     <span>·</span>
