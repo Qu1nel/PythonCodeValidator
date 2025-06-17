@@ -26,9 +26,9 @@
   <h4>
     <a href="#-quick-usage-example">Usage Examples</a>
     <span>·</span>
-    <a href="https://[your-project].readthedocs.io">Full Documentation</a>
+    <a href="https://pythoncodevalidator.readthedocs.io/en/latest/">Full Documentation</a>
     <span>·</span>
-    <a href="#">AI documentation</a>
+    <a href="deepwiki.com/Qu1nel/PythonCodeValidator">AI documentation</a>
     <span>·</span>
     <a href="https://github.com/Qu1nel/PythonCodeValidator/blob/main/docs/how_it_works/index.md">Developer's Guide</a>
     <span>·</span>
@@ -228,7 +228,7 @@ Validation failed.
 - **Full User Guide & JSON Specification**: Our complete documentation is hosted on
   **[Read the Docs](https://[your-project].readthedocs.io)**.
 - **Developer's Guide**: For a deep dive into the architecture, see the
-**[How It Works guide](./docs/how_it_works/index.md)**.
+  **[How It Works guide](./docs/how_it_works/index.md)**.
 - **Interactive AI-Powered Docs**: *(Coming Soon)* An interactive documentation experience.
 
 ## 🤝 Contributing
