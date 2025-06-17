@@ -80,7 +80,7 @@ coverage-html: ## Run tests and generate an HTML coverage report. Ex: make cover
 # ==============================================================================
 
 .PHONY: build
-build: clean ## Build the package into wheel and sdist artifacts
+build: ## Build the package into wheel and sdist artifacts
 	@echo "$(BLUE)› Building package...$(RESET)"
 	@$(BUILD_RUNNER)
 	@echo "$(GREEN)✅ Package built in 'dist/'.$(RESET)"
