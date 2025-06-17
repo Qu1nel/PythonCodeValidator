@@ -39,6 +39,12 @@ dev = [
     "twine",
     "coverage>=7.5.0",
 ]
+docs = [
+    "sphinx>=7.0.0",
+    "furo",
+    "myst-parser",
+    "sphinx-design",
+]
 
 
 [tool.ruff]
