@@ -229,7 +229,7 @@ Validation failed.
   **[Read the Docs](https://[your-project].readthedocs.io)**.
 - **Developer's Guide**: For a deep dive into the architecture, see the
   **[How It Works guide](./docs/how_it_works/index.md)**.
-- **Interactive AI-Powered Docs**: *(Coming Soon)* An interactive documentation experience.
+- **Interactive AI-Powered Docs**: **[DeepWiki](https://deepwiki.com/Qu1nel/PythonCodeValidator)**.
 
 ## 🤝 Contributing
 
