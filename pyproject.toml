@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "python-code-validator"
-version = "0.1.1"
+version = "0.1.2"
 authors = [{ name = "Qu1nel", email = "covach.qn@gmail.com" }]
 description = "A flexible framework for static validation of Python code based on JSON rules."
 readme = "README.md"
@@ -24,6 +24,7 @@ classifiers = [
 
 [project.urls]
 "Homepage" = "https://github.com/Qu1nel/PythonCodeValidator"
+"Documentation" = "https://pythoncodevalidator.readthedocs.io/en/latest/"
 "Bug Tracker" = "https://github.com/Qu1nel/PythonCodeValidator/issues"
 
 
