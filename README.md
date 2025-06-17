@@ -30,7 +30,7 @@
     <span>·</span>
     <a href="#">AI documentation</a>
     <span>·</span>
-    <a href="https://github.com/Qu1nel/PythonCodeValidator/blob/main/docs/how-it-works.md">Developer's Guide</a>
+    <a href="https://github.com/Qu1nel/PythonCodeValidator/blob/main/docs/how_it_works/index.md">Developer's Guide</a>
     <span>·</span>
     <a href="https://github.com/Qu1nel/PythonCodeValidator/issues/new?template=1-bug-report.md">Report a Bug</a>
     <span>·</span>
