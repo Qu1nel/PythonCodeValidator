@@ -11,12 +11,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "python-code-validator"
 version = "0.1.3"
-authors = [{ name = "Qu1nel", email = "covach.qn@gmail.com" }]
 description = "A flexible, AST-based framework for static validation of Python code using declarative JSON rules."
+keywords = ["validation", "linter", "static analysis", "testing", "education", "ast"]
+authors = [{ name = "Qu1nel", email = "covach.qn@gmail.com" }]
 readme = "README.md"
 requires-python = ">=3.11"
 license = { file = "LICENSE" }
-keywords = ["validation", "linter", "static analysis", "testing", "education", "ast"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -40,8 +40,10 @@ dependencies = [
 "Documentation" = "https://pythoncodevalidator.readthedocs.io/en/latest/"
 "Bug Tracker" = "https://github.com/Qu1nel/PythonCodeValidator/issues"
 
+
 [project.scripts]
 validate-code = "code_validator.cli:run_from_cli"
+
 
 [project.optional-dependencies]
 dev = [
@@ -81,8 +83,7 @@ select = [
     "C4", # flake8-comprehensions
     "D", # pydocstyle
 ]
-ignore = [
-]
+ignore = []
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = [
@@ -95,7 +96,6 @@ ignore = [
 ]
 "src/code_validator/components/__init__.py" = ["D104"]
 "src/code_validator/rules_library/__init__.py" = ["D104"]
-
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"

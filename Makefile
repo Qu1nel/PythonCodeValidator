@@ -1,3 +1,10 @@
+# ==============================================================================
+#  Makefile for Python Projects
+#  - Author: Qu1nel
+#  - Version: 2.0
+# ==============================================================================
+
+
 # --- Color Codes for Output (work in Linux, macOS, Git Bash, WSL) ---
 RESET   = \033[0m
 BOLD    = \033[1m
@@ -25,7 +32,7 @@ TWINE_RUNNER    := $(PYTHON_RUNNER) -m twine
 .PHONY: setup
 setup: ## Install all dependencies for development. Ex: make setup
 	@echo "$(CYAN)› Setting up virtual environment and installing dependencies...$(RESET)"
-	@uv venv -p 3.11
+	@uv venv -p 3.11 --seed
 	@uv pip install -e ".[dev,docs]"
 	@echo "$(GREEN)✅ Setup complete. Activate with 'source .venv/bin/activate' or '.venv\\Scripts\\activate'.$(RESET)"
 
