@@ -45,9 +45,9 @@ import json
 from .components.ast_utils import enrich_ast_with_parents
 from .components.definitions import Rule
 from .components.factories import RuleFactory
-from .config import AppConfig, LogLevel
+from .config import AppConfig, LogLevel, ShortRuleConfig
 from .exceptions import RuleParsingError
-from .output import Console
+from .output import Console, log_initialization
 
 
 class StaticValidator:
@@ -67,6 +67,7 @@ class StaticValidator:
         _failed_rules (list[int]): A list of rule IDs that failed during the run.
     """
 
+    @log_initialization(level=LogLevel.DEBUG)
     def __init__(self, config: AppConfig, console: Console):
         """Initializes the StaticValidator.
 
@@ -77,6 +78,7 @@ class StaticValidator:
         """
         self._config = config
         self._console = console
+
         self._rule_factory = RuleFactory(self._console)
         self._source_code: str = ""
         self._ast_tree: ast.Module | None = None
@@ -95,38 +97,16 @@ class StaticValidator:
             FileNotFoundError: If the source file specified in the config does not exist.
             RuleParsingError: If the source file cannot be read for any other reason.
         """
-        self._console.print(f"Reading source file: {self._config.solution_path}")
+        self._console.print(f"Reading source file: {self._config.solution_path}", level=LogLevel.DEBUG)
         try:
             self._source_code = self._config.solution_path.read_text(encoding="utf-8")
+            self._console.print(f"Source code:\n{self._source_code}\n", level=LogLevel.TRACE)
         except FileNotFoundError:
+            self._console.print("During reading source file raised FileNotFound", level=LogLevel.TRACE)
             raise
         except Exception as e:
+            self._console.print("During reading source file raised some exception..", level=LogLevel.TRACE)
             raise RuleParsingError(f"Cannot read source file: {e}") from e
-
-    def _parse_ast_tree(self) -> bool:
-        """Parses the loaded source code into an AST and enriches it.
-
-        This method attempts to parse the source code. If successful, it calls
-        a helper to add parent references to each node in the tree, which is
-        crucial for many advanced checks. If a `SyntaxError` occurs, it
-        checks if a `check_syntax` rule was defined to provide a custom message.
-
-        Returns:
-            bool: True if parsing was successful, False otherwise.
-        """
-        self._console.print("Parsing Abstract Syntax Tree (AST)...")
-        try:
-            self._ast_tree = ast.parse(self._source_code)
-            enrich_ast_with_parents(self._ast_tree)
-            return True
-        except SyntaxError as e:
-            for rule in self._rules:
-                if getattr(rule.config, "type", None) == "check_syntax":
-                    self._console.print(rule.config.message, level=LogLevel.ERROR)
-                    self._failed_rules.append(rule.config.rule_id)
-                    return False
-            self._console.print(f"Syntax Error found: {e}", level=LogLevel.ERROR)
-            return False
 
     def _load_and_parse_rules(self) -> None:
         """Loads and parses the JSON file into executable Rule objects.
@@ -140,19 +120,51 @@ class StaticValidator:
             RuleParsingError: If the JSON is malformed or a rule configuration
                 is invalid.
         """
-        self._console.print(f"Loading rules from: {self._config.rules_path}")
+        self._console.print(f"Loading rules from: {self._config.rules_path}", level=LogLevel.DEBUG)
         try:
             rules_data = json.loads(self._config.rules_path.read_text(encoding="utf-8"))
+            self._console.print(f"Load rules:\n{rules_data}", level=LogLevel.TRACE)
             raw_rules = rules_data.get("validation_rules")
             if not isinstance(raw_rules, list):
                 raise RuleParsingError("`validation_rules` key not found or is not a list.")
 
+            self._console.print(f"Found {len(raw_rules)}.", level=LogLevel.DEBUG)
             self._rules = [self._rule_factory.create(rule) for rule in raw_rules]
-            self._console.print(f"Successfully parsed {len(self._rules)} rules.")
+            self._console.print(f"Successfully parsed {len(self._rules)} rules.", level=LogLevel.DEBUG)
         except json.JSONDecodeError as e:
+            self._console.print("During reading file of rules raised JsonDecodeError..", level=LogLevel.TRACE)
             raise RuleParsingError(f"Invalid JSON in rules file: {e}") from e
         except FileNotFoundError:
+            self._console.print("During reading file of rules raised FileNotFound", level=LogLevel.TRACE)
             raise
+
+    def _parse_ast_tree(self) -> bool:
+        """Parses the loaded source code into an AST and enriches it.
+
+        This method attempts to parse the source code. If successful, it calls
+        a helper to add parent references to each node in the tree, which is
+        crucial for many advanced checks. If a `SyntaxError` occurs, it
+        checks if a `check_syntax` rule was defined to provide a custom message.
+
+        Returns:
+            bool: True if parsing was successful, False otherwise.
+        """
+        self._console.print("Parsing Abstract Syntax Tree (AST)...", level=LogLevel.DEBUG)
+        try:
+            self._console.print("Start parse source code.", level=LogLevel.TRACE)
+            self._ast_tree = ast.parse(self._source_code)
+            enrich_ast_with_parents(self._ast_tree)
+            return True
+        except SyntaxError as e:
+            self._console.print("In source code SyntaxError..", level=LogLevel.TRACE)
+            for rule in self._rules:
+                if getattr(rule.config, "type", None) == "check_syntax":
+                    self._console.print(rule.config.message, level=LogLevel.ERROR, show_user=True)
+                    self._console.print(f"Failed rule id: {rule.config.rule_id}", level=LogLevel.DEBUG)
+                    self._failed_rules.append(rule.config.rule_id)
+                    return False
+            self._console.print(f"Syntax Error found: {e}", level=LogLevel.ERROR)
+            return False
 
     def run(self) -> bool:
         """Runs the entire validation process from start to finish.
@@ -174,20 +186,35 @@ class StaticValidator:
             if not self._parse_ast_tree():
                 return False
 
-        except (FileNotFoundError, RuleParsingError):
+            self._console.print("Lead source code, load and parse rules and parsing code - PASS", level=LogLevel.DEBUG)
+
+        except (FileNotFoundError, RuleParsingError) as e:
+            self._console.print(f"In method `run` of 'StaticValidator' raised exception {e.__class__.__name__}",
+                                level=LogLevel.WARNING)
             raise
 
+        self._console.print("Starting check rules..", level=LogLevel.DEBUG)
         for rule in self._rules:
             if getattr(rule.config, "type", None) == "check_syntax":
                 continue
 
-            self._console.print(f"Executing rule: {rule.config.rule_id}", level=LogLevel.DEBUG)
+            self._console.print(
+                f"Executing rule: {rule.config.rule_id}"
+                + (
+                    f" [{rule.config.check.selector.type}, {rule.config.check.constraint.type}, "
+                    f"is_critical={rule.config.is_critical}]" if not isinstance(rule.config, ShortRuleConfig) else ""
+                ),
+                level=LogLevel.INFO
+            )
             is_passed = rule.execute(self._ast_tree, self._source_code)
             if not is_passed:
-                self._console.print(rule.config.message, level=LogLevel.ERROR)
+                self._console.print(rule.config.message, level=LogLevel.WARNING, show_user=True)
+                self._console.print(f"Rule {rule.config.rule_id} - FAIL", level=LogLevel.INFO)
                 self._failed_rules.append(rule.config.rule_id)
                 if getattr(rule.config, "is_critical", False) or self._config.stop_on_first_fail:
                     self._console.print("Critical rule failed. Halting validation.", level=LogLevel.WARNING)
                     break
+            else:
+                self._console.print(f"Rule {rule.config.rule_id} - PASS", level=LogLevel.INFO)
 
         return not self._failed_rules

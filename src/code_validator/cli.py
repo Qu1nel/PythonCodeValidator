@@ -87,26 +87,32 @@ def run_from_cli() -> None:
         is_quiet=args.quiet,
         stop_on_first_fail=args.stop_on_first_fail,
     )
+    console.print(f"Config is: {config}", level=LogLevel.TRACE)
 
     try:
         console.print(f"Starting validation for: {config.solution_path}", level=LogLevel.INFO)
         validator = StaticValidator(config, console)
+
+        console.print("Start of validation..", level=LogLevel.TRACE)
         is_valid = validator.run()
+        console.print(f"End of validation with result: {is_valid = }", level=LogLevel.TRACE)
 
         if is_valid:
-            console.print("Validation successful.", level=LogLevel.INFO)
+            console.print("Validation successful.", level=LogLevel.INFO, is_verdict=True)
             sys.exit(ExitCode.SUCCESS)
         else:
-            console.print("Validation failed.", level=LogLevel.ERROR)
+            console.print("Validation failed.", level=LogLevel.INFO, is_verdict=True)
             sys.exit(ExitCode.VALIDATION_FAILED)
 
     except CodeValidatorError as e:
-        console.print(str(e), level=LogLevel.CRITICAL)
+        console.print(f"Error: Internal Error of validator!", level=LogLevel.CRITICAL)
+        logger.exception(f"Traceback for CodeValidatorError: {e}")
         sys.exit(ExitCode.VALIDATION_FAILED)
     except FileNotFoundError as e:
-        console.print(f"Error: File not found - {e.strerror}: {e.filename}", level=LogLevel.CRITICAL)
+        console.print(f"Error: File not found - {e.filename}!", level=LogLevel.CRITICAL)
+        logger.exception(f"Traceback for FileNotFoundError: {e}")
         sys.exit(ExitCode.FILE_NOT_FOUND)
     except Exception as e:
-        console.print(f"An unexpected error occurred: {e}", level=LogLevel.CRITICAL)
-        logger.exception("Traceback for unexpected error:")
+        console.print(f"An unexpected error occurred: {e.__class__.__name__}!", level=LogLevel.CRITICAL)
+        logger.exception(f"Traceback for unexpected error: {e}")
         sys.exit(ExitCode.UNEXPECTED_ERROR)

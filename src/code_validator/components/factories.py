@@ -10,9 +10,10 @@ rules file and instantiating the appropriate handler classes from the
 import dataclasses
 from typing import Any, Type, TypeVar
 
-from ..config import ConstraintConfig, FullRuleCheck, FullRuleConfig, SelectorConfig, ShortRuleConfig
+from .definitions import Constraint, Rule, Selector
+from ..config import ConstraintConfig, FullRuleCheck, FullRuleConfig, SelectorConfig, ShortRuleConfig, LogLevel
 from ..exceptions import RuleParsingError
-from ..output import Console
+from ..output import Console, log_initialization
 from ..rules_library.basic_rules import CheckLinterRule, CheckSyntaxRule, FullRuleHandler
 from ..rules_library.constraint_logic import (
     IsForbiddenConstraint,
@@ -33,7 +34,6 @@ from ..rules_library.selector_nodes import (
     LiteralSelector,
     UsageSelector,
 )
-from .definitions import Constraint, Rule, Selector
 
 T = TypeVar("T")
 
@@ -71,6 +71,7 @@ class RuleFactory:
         _constraint_factory (ConstraintFactory): A factory for creating constraint objects.
     """
 
+    @log_initialization(level=LogLevel.TRACE)
     def __init__(self, console: Console):
         """Initializes the RuleFactory.
 
@@ -101,8 +102,10 @@ class RuleFactory:
                 required keys, or specifies an unknown type.
         """
         rule_id = rule_config.get("rule_id")
+        self._console.print(f"Start parsing rule ({rule_id}):\n{rule_config}", level=LogLevel.TRACE)
         try:
             if "type" in rule_config:
+                self._console.print(f"Rule {rule_id} is shorted rule - {rule_config['type']}", level=LogLevel.DEBUG)
                 config = _create_dataclass_from_dict(ShortRuleConfig, rule_config)
                 return self._create_short_rule(config)
 
@@ -110,20 +113,32 @@ class RuleFactory:
                 raw_selector_cfg = rule_config["check"]["selector"]
                 raw_constraint_cfg = rule_config["check"]["constraint"]
 
+                selector_cfg = _create_dataclass_from_dict(SelectorConfig, raw_selector_cfg)
+                constraint_cfg = _create_dataclass_from_dict(ConstraintConfig, raw_constraint_cfg)
+
+                # TODO: оптимизировать (в create создается конфиг) = 1
                 selector = self._selector_factory.create(raw_selector_cfg)
                 constraint = self._constraint_factory.create(raw_constraint_cfg)
 
-                selector_cfg = _create_dataclass_from_dict(SelectorConfig, raw_selector_cfg)
-                constraint_cfg = _create_dataclass_from_dict(ConstraintConfig, raw_constraint_cfg)
+                self._console.print(
+                    f"Rule {rule_id} is general rule with: selector - "
+                    f"{selector_cfg.type}, constraint - {raw_constraint_cfg['type']}",
+                    level=LogLevel.DEBUG
+                )
+
                 check_cfg = FullRuleCheck(selector=selector_cfg, constraint=constraint_cfg)
+                self._console.print(f"Create FullRuleCheck: {check_cfg}", level=LogLevel.TRACE)
+
                 config = FullRuleConfig(
                     rule_id=rule_config["rule_id"],
                     message=rule_config["message"],
                     check=check_cfg,
                     is_critical=rule_config.get("is_critical", False),
                 )
+                self._console.print(f"Create FullRuleConfig: {config}", level=LogLevel.TRACE)
                 return FullRuleHandler(config, selector, constraint, self._console)
             else:
+                self._console.print(f"Invalid syntax of rule: {rule_id}", level=LogLevel.WARNING)
                 raise RuleParsingError("Rule must contain 'type' or 'check' key.", rule_id)
         except (TypeError, KeyError, RuleParsingError) as e:
             raise RuleParsingError(f"Invalid config for rule '{rule_id}': {e}", rule_id) from e
@@ -165,6 +180,10 @@ class SelectorFactory:
     any state.
     """
 
+    @log_initialization(level=LogLevel.TRACE)
+    def __init__(self) -> None:
+        pass
+
     @staticmethod
     def create(selector_config: dict[str, Any]) -> Selector:
         """Creates a specific selector instance based on its type.
@@ -178,7 +197,7 @@ class SelectorFactory:
         Returns:
             An instance of a class that conforms to the Selector protocol.
         """
-        config = _create_dataclass_from_dict(SelectorConfig, selector_config)
+        config = _create_dataclass_from_dict(SelectorConfig, selector_config)  # TODO (1)
 
         match config.type:
             case "function_def":
@@ -210,6 +229,10 @@ class ConstraintFactory:
     to a list of AST nodes. This class uses a static `create` method.
     """
 
+    @log_initialization(level=LogLevel.TRACE)
+    def __init__(self) -> None:
+        pass
+
     @staticmethod
     def create(constraint_config: dict[str, Any]) -> Constraint:
         """Creates a specific constraint instance based on its type.
@@ -223,7 +246,7 @@ class ConstraintFactory:
         Returns:
             An instance of a class that conforms to the Constraint protocol.
         """
-        config = _create_dataclass_from_dict(ConstraintConfig, constraint_config)
+        config = _create_dataclass_from_dict(ConstraintConfig, constraint_config)  # TODO (1)
 
         match config.type:
             case "is_required":

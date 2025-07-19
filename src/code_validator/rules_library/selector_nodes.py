@@ -13,6 +13,7 @@ from typing import Any
 from ..components.ast_utils import get_full_name
 from ..components.definitions import Selector
 from ..components.scope_handler import find_scope_node
+from ..output import log_initialization, LogLevel
 
 
 class ScopedSelector(Selector):
@@ -67,6 +68,7 @@ class FunctionDefSelector(ScopedSelector):
         name (str): The name of the function to find. Use "*" to find all.
     """
 
+    @log_initialization(level=LogLevel.TRACE)
     def __init__(self, **kwargs: Any):
         """Initializes the FunctionDefSelector.
 
@@ -98,6 +100,7 @@ class ClassDefSelector(ScopedSelector):
         name (str): The name of the class to find. Use "*" to find all.
     """
 
+    @log_initialization(level=LogLevel.TRACE)
     def __init__(self, **kwargs: Any):
         """Initializes the selector."""
         super().__init__(**kwargs)
@@ -124,6 +127,7 @@ class ImportStatementSelector(ScopedSelector):
         name (str): The name of the module to find (e.g., "os", "requests").
     """
 
+    @log_initialization(level=LogLevel.TRACE)
     def __init__(self, **kwargs: Any):
         """Initializes the ImportStatementSelector.
 
@@ -169,6 +173,7 @@ class FunctionCallSelector(ScopedSelector):
         name (str): The full name of the function being called.
     """
 
+    @log_initialization(level=LogLevel.TRACE)
     def __init__(self, **kwargs: Any):
         """Initializes the selector."""
         super().__init__(**kwargs)
@@ -200,6 +205,7 @@ class AssignmentSelector(ScopedSelector):
         name (str): The full name of the variable or attribute being assigned to.
     """
 
+    @log_initialization(level=LogLevel.TRACE)
     def __init__(self, **kwargs: Any):
         """Initializes the AssignmentSelector.
 
@@ -239,6 +245,7 @@ class UsageSelector(ScopedSelector):
         name (str): The name of the variable or attribute being used.
     """
 
+    @log_initialization(level=LogLevel.TRACE)
     def __init__(self, **kwargs: Any):
         """Initializes the UsageSelector.
 
@@ -273,6 +280,7 @@ class LiteralSelector(ScopedSelector):
         name (str): The type of literal to find. Supported: "number", "string".
     """
 
+    @log_initialization(level=LogLevel.TRACE)
     def __init__(self, **kwargs: Any):
         """Initializes the LiteralSelector.
 
@@ -340,6 +348,7 @@ class AstNodeSelector(ScopedSelector):
             as defined in the `ast` module (e.g., "For", "While", "Try").
     """
 
+    @log_initialization(level=LogLevel.TRACE)
     def __init__(self, **kwargs: Any):
         """Initializes the AstNodeSelector.
 

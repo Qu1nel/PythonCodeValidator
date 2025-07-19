@@ -12,8 +12,10 @@ used internally by the constraint classes.
 import ast
 from typing import Any
 
+from .. import LogLevel
 from ..components.ast_utils import get_full_name
 from ..components.definitions import Constraint
+from ..output import log_initialization
 
 
 class IsRequiredConstraint(Constraint):
@@ -27,6 +29,7 @@ class IsRequiredConstraint(Constraint):
             nodes is exactly equal to this value.
     """
 
+    @log_initialization(level=LogLevel.TRACE)
     def __init__(self, **kwargs: Any):
         """Initializes the constraint.
 
@@ -49,6 +52,7 @@ class IsForbiddenConstraint(Constraint):
     constructs, such as specific function calls or imports.
     """
 
+    @log_initialization(level=LogLevel.TRACE)
     def __init__(self, **kwargs: Any):
         """Initializes the constraint."""
         pass
@@ -69,6 +73,7 @@ class MustInheritFromConstraint(Constraint):
         parent_name (str): The expected name of the parent class.
     """
 
+    @log_initialization(level=LogLevel.TRACE)
     def __init__(self, **kwargs: Any):
         """Initializes the constraint.
 
@@ -114,6 +119,7 @@ class MustBeTypeConstraint(Constraint):
         expected_type (str): The name of the type, e.g., "str", "int", "list".
     """
 
+    @log_initialization(level=LogLevel.TRACE)
     def __init__(self, **kwargs: Any):
         """Initializes the constraint.
 
@@ -179,6 +185,7 @@ class NameMustBeInConstraint(Constraint):
         allowed_names (list[str]): A list of strings containing the allowed names.
     """
 
+    @log_initialization(level=LogLevel.TRACE)
     def __init__(self, **kwargs: Any):
         """Initializes the constraint.
 
@@ -215,6 +222,7 @@ class ValueMustBeInConstraint(Constraint):
         allowed_values (list): A list of allowed literal values (e.g., [0, 1]).
     """
 
+    @log_initialization(level=LogLevel.TRACE)
     def __init__(self, **kwargs: Any):
         """Initializes the constraint.
 
@@ -251,6 +259,7 @@ class MustHaveArgsConstraint(Constraint):
             for presence, not for exact list match. Defaults to True.
     """
 
+    @log_initialization(level=LogLevel.TRACE)
     def __init__(self, **kwargs: Any):
         """Initializes the constraint.
 

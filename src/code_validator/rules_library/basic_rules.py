@@ -13,7 +13,7 @@ import sys
 
 from ..components.definitions import Constraint, Rule, Selector
 from ..config import FullRuleConfig, ShortRuleConfig
-from ..output import Console, LogLevel
+from ..output import Console, LogLevel, log_initialization
 
 
 class CheckSyntaxRule(Rule):
@@ -27,6 +27,7 @@ class CheckSyntaxRule(Rule):
         formally defined in the JSON configuration.
     """
 
+    @log_initialization(level=LogLevel.TRACE)
     def __init__(self, config: ShortRuleConfig, console: Console):
         """Initializes the syntax check rule handler.
 
@@ -45,7 +46,7 @@ class CheckSyntaxRule(Rule):
         Returns:
             Always returns True.
         """
-        self._console.print(f"Rule {self.config.rule_id}: Syntax is valid.", level=LogLevel.DEBUG)
+        self._console.print(f"Rule {self.config.rule_id}: Syntax is valid.", level=LogLevel.INFO)
         return True
 
 
@@ -57,6 +58,7 @@ class CheckLinterRule(Rule):
     configurable via the 'params' field in the JSON rule.
     """
 
+    @log_initialization(level=LogLevel.TRACE)
     def __init__(self, config: ShortRuleConfig, console: Console):
         """Initializes a PEP8 linter check rule handler."""
         self.config = config
@@ -80,7 +82,7 @@ class CheckLinterRule(Rule):
             self._console.print("Source code is empty, skipping PEP8 check.", level=LogLevel.WARNING)
             return True
 
-        self._console.print(f"Rule {self.config.rule_id}: Running flake8 linter...", level=LogLevel.DEBUG)
+        self._console.print(f"Rule {self.config.rule_id}: Running PEP8 linter...", level=LogLevel.INFO)
 
         params = self.config.params
         args = [sys.executable, "-m", "flake8", "-"]
@@ -89,6 +91,8 @@ class CheckLinterRule(Rule):
             args.append(f"--select={','.join(select_list)}")
         elif ignore_list := params.get("ignore"):
             args.append(f"--ignore={','.join(ignore_list)}")
+
+        self._console.print(f"Arguments for flake8: {args}", level=LogLevel.TRACE)
 
         try:
             process = subprocess.run(
@@ -102,7 +106,7 @@ class CheckLinterRule(Rule):
 
             if process.returncode != 0 and process.stdout:
                 linter_output = process.stdout.strip()
-                self._console.print(f"Flake8 found issues:\n{linter_output}", level=LogLevel.DEBUG)
+                self._console.print(f"Flake8 found issues:\n{linter_output}", level=LogLevel.WARNING, show_user=True)
                 return False
             elif process.returncode != 0:
                 self._console.print(
@@ -110,7 +114,7 @@ class CheckLinterRule(Rule):
                 )
                 return False
 
-            self._console.print("PEP8 check passed.", level=LogLevel.ERROR)
+            self._console.print("PEP8 check passed.", level=LogLevel.INFO)
             return True
         except FileNotFoundError:
             self._console.print("flake8 not found. Is it installed in the venv?", level=LogLevel.CRITICAL)
@@ -134,6 +138,7 @@ class FullRuleHandler(Rule):
         _console (Console): The console handler for logging.
     """
 
+    @log_initialization(level=LogLevel.TRACE)
     def __init__(self, config: FullRuleConfig, selector: Selector, constraint: Constraint, console: Console):
         """Initializes a full rule handler.
 
@@ -162,8 +167,8 @@ class FullRuleHandler(Rule):
             self._console.print("AST not available, skipping rule.", level=LogLevel.WARNING)
             return True
 
-        self._console.print(f"Applying selector: {self._selector.__class__.__name__}", level=LogLevel.DEBUG)
+        self._console.print(f"Applying selector: {self._selector.__class__.__name__}", level=LogLevel.TRACE)
         selected_nodes = self._selector.select(tree)
 
-        self._console.print(f"Applying constraint: {self._constraint.__class__.__name__}", level=LogLevel.DEBUG)
+        self._console.print(f"Applying constraint: {self._constraint.__class__.__name__}", level=LogLevel.TRACE)
         return self._constraint.check(selected_nodes)
