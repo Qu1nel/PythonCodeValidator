@@ -14,15 +14,30 @@ Unreleased
 
 *This section is for upcoming changes. It will become the next version's release notes.*
 
+
 Added
 -----
 
 - *...*
 
+
 Changed
 -------
 
+- *The internal logic of creating rules has been optimized:* Redundant configuration conversion has been eliminated, making the process more efficient.
+
+
+Deprecated
+-----
+
 - *...*
+
+
+Removed
+-----
+
+- *...*
+
 
 Fixed
 -----
@@ -30,7 +45,34 @@ Fixed
 - *...*
 
 
-----
+Security
+-----
+
+- *...*
+
+
+
+v0.2.0 - 2025-07-19
+===================
+
+Added
+-----
+
+- Added the command line option `--no-verdict` to hide the final verdict when displaying validation results.
+- A new `TRACE` level has been added to the logging system for more detailed debugging.
+
+Changed
+-------
+
+- **[Breaking Change]** The command line argument for controlling the logging level `--log-level` has been renamed to `--log`.
+- The logging system has been improved: the message format has been updated for better readability, and the default level has been changed to `ERROR`.
+
+Removed
+-------
+
+- **[Breaking Change]** The `--silent` command line option has been removed. To suppress the output, you should now use the new `--quiet` option.
+
+
 
 v0.1.3 - 2025-06-17
 ===================
