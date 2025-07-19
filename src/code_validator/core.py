@@ -166,6 +166,49 @@ class StaticValidator:
             self._console.print(f"Syntax Error found: {e}", level=LogLevel.ERROR)
             return False
 
+    def _report_errors(self) -> None:
+        """Formats and prints collected validation errors to the console.
+
+        This method is responsible for presenting the final list of failed
+        rules to the user. It respects the `--max-messages` configuration
+        to avoid cluttering the terminal. If the number of found errors
+        exceeds the specified limit, it truncates the output and displays
+        a summary message indicating how many more errors were found.
+
+        The method retrieves the list of failed rules from `self._failed_rules`
+        and the display limit from `self._config`. All user-facing output is
+        channeled through the `self._console` object.
+
+        It performs the following steps:
+          1. Checks if any errors were recorded. If not, it returns immediately.
+          2. Determines the subset of errors to display based on the configured
+             `max_messages` limit (a value of 0 means no limit).
+          3. Iterates through the selected error rules and prints their
+             failure messages.
+          4. If the error list was truncated, prints a summary line, e.g.,
+             "... (5 more errors found)".
+        """
+        max_errors = self._config.max_messages
+        num_errors = len(self._failed_rules)
+
+        if num_errors == 0:
+            return None
+
+        errors_to_show = self._failed_rules
+        if 0 < max_errors < num_errors:
+            errors_to_show = self._failed_rules[:max_errors]
+
+        for rule in errors_to_show:
+            self._console.print(rule.config.message, level=LogLevel.WARNING, show_user=True)
+
+        if 0 < max_errors < num_errors:
+            remaining_count = num_errors - max_errors
+            self._console.print(
+                f"... ({remaining_count} more error{'s' if remaining_count > 1 else ''} found)",
+                level=LogLevel.WARNING,
+                show_user=True,
+            )
+
     def run(self) -> bool:
         """Runs the entire validation process from start to finish.
 
@@ -184,6 +227,7 @@ class StaticValidator:
             self._load_and_parse_rules()
 
             if not self._parse_ast_tree():
+                self._report_errors()
                 return False
 
             self._console.print("Lead source code, load and parse rules and parsing code - PASS", level=LogLevel.DEBUG)
@@ -222,5 +266,7 @@ class StaticValidator:
                     break
             else:
                 self._console.print(f"Rule {rule.config.rule_id} - PASS", level=LogLevel.INFO)
+
+        self._report_errors()
 
         return not self._failed_rules

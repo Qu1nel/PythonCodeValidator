@@ -210,6 +210,7 @@ class Console:
         level: LogLevel | Literal["TRACE", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = LogLevel.TRACE,
         is_verdict: bool = False,
         show_user: bool = False,
+        exc_info: bool = False,
     ) -> None:
         """Prints a message to stdout and logs it simultaneously.
 
@@ -228,9 +229,10 @@ class Console:
             show_user:  If True and `is_verdict=False`, allows
                         printing non-verdict messages to stdout. Defaults to
                         False.
+            exc_info:   If True this work as loggings.exception("<message>").
         """
         level_num = logging.getLevelName(level if isinstance(level, LogLevel) else level)
-        self._logger.log(level_num, message, stacklevel=2)
+        self._logger.log(level_num, message, stacklevel=2, exc_info=exc_info)
 
         if (not self._is_quiet) and ((not is_verdict and show_user) or (is_verdict and self._show_verdict)):
             print(message, file=self._stdout)

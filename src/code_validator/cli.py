@@ -105,18 +105,24 @@ def run_from_cli() -> None:
             console.print("Validation successful.", level=LogLevel.INFO, is_verdict=True)
             sys.exit(ExitCode.SUCCESS)
         else:
-            console.print("Validation failed.", level=LogLevel.INFO, is_verdict=True)
+            console.print("Validation failed.", level=LogLevel.WARNING, is_verdict=True)
             sys.exit(ExitCode.VALIDATION_FAILED)
 
     except CodeValidatorError as e:
-        console.print("Error: Internal Error of validator!", level=LogLevel.CRITICAL)
-        logger.exception(f"Traceback for CodeValidatorError: {e}")
+        console.print(
+            f"Error: An internal validator error occurred: {e}", level=LogLevel.CRITICAL, show_user=True, exc_info=True
+        )
         sys.exit(ExitCode.VALIDATION_FAILED)
     except FileNotFoundError as e:
-        console.print(f"Error: File not found - {e.filename}!", level=LogLevel.CRITICAL)
-        logger.exception(f"Traceback for FileNotFoundError: {e}")
+        console.print(
+            f"Error: Input file not found: {e.filename}", level=LogLevel.CRITICAL, show_user=True, exc_info=True
+        )
         sys.exit(ExitCode.FILE_NOT_FOUND)
     except Exception as e:
-        console.print(f"An unexpected error occurred: {e.__class__.__name__}!", level=LogLevel.CRITICAL)
-        logger.exception(f"Traceback for unexpected error: {e}")
+        console.print(
+            f"Error: An unexpected error occurred: {e.__class__.__name__}. See logs for detailed traceback.",
+            level=LogLevel.CRITICAL,
+            show_user=True,
+            exc_info=True,
+        )
         sys.exit(ExitCode.UNEXPECTED_ERROR)
