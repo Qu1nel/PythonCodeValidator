@@ -51,7 +51,7 @@ class AppConfig:
     log_level: LogLevel
     is_quiet: bool
     exit_on_first_error: bool
-    max_messages: int
+    max_messages: int = 0
 
 
 @dataclass(frozen=True)

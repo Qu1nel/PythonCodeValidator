@@ -24,7 +24,7 @@ class TestStaticValidatorIntegration(unittest.TestCase):
             rules_path=FIXTURES_DIR / rules_file,
             log_level=LogLevel.CRITICAL,
             is_quiet=True,
-            stop_on_first_fail=False,
+            exit_on_first_error=False,
         )
         validator = StaticValidator(config, self.console)
         return validator.run()
@@ -81,7 +81,7 @@ class TestStaticValidatorIntegration(unittest.TestCase):
             rules_path=rules_path,
             log_level=LogLevel.CRITICAL,
             is_quiet=True,
-            stop_on_first_fail=False,
+            exit_on_first_error=False,
         )
         validator = StaticValidator(config, self.console)
 
@@ -133,7 +133,7 @@ class TestStaticValidatorIntegration(unittest.TestCase):
 
         self.assertFalse(result)
 
-    def test_stop_on_first_fail_works(self):
+    def test_exit_on_first_error_works(self):
         """Tests that the validator stops after the first failure if flag is set."""
         rules = {
             "validation_rules": [
@@ -165,7 +165,7 @@ class TestStaticValidatorIntegration(unittest.TestCase):
             rules_path=rules_path,
             log_level=LogLevel.CRITICAL,
             is_quiet=True,
-            stop_on_first_fail=True,
+            exit_on_first_error=True,
         )
         validator = StaticValidator(config, self.console)
         validator.run()
@@ -173,7 +173,8 @@ class TestStaticValidatorIntegration(unittest.TestCase):
 
         # Проверяем, что провалилось только одно правило, а не два
         self.assertEqual(len(validator.failed_rules_id), 1)
-        self.assertEqual(validator.failed_rules_id[0], 1)
+        # noinspection PyTypeChecker
+        self.assertEqual(validator.failed_rules_id[0].config.rule_id, 1)
 
     def test_unknown_rule_type_raises_error(self):
         """Tests that an unknown rule type in JSON raises RuleParsingError."""
@@ -256,7 +257,7 @@ class TestValidatorRobustness(unittest.TestCase):
             rules_path=FIXTURES_DIR / rules_file,
             log_level=LogLevel.CRITICAL,
             is_quiet=True,
-            stop_on_first_fail=False,
+            exit_on_first_error=False,
         )
         validator = StaticValidator(config, self.console)
         return validator.run()
@@ -273,7 +274,7 @@ class TestValidatorRobustness(unittest.TestCase):
             rules_path=self.valid_rules_path,
             log_level=LogLevel.CRITICAL,
             is_quiet=True,
-            stop_on_first_fail=False,
+            exit_on_first_error=False,
         )
         # Ожидаем, что проверка провалится (т.к. в пустом файле нет нужных функций),
         # но сама программа не упадет с ошибкой.
@@ -287,7 +288,7 @@ class TestValidatorRobustness(unittest.TestCase):
             rules_path=self.valid_rules_path,
             log_level=LogLevel.CRITICAL,
             is_quiet=True,
-            stop_on_first_fail=False,
+            exit_on_first_error=False,
         )
         # Проверяем, что вызов .run() вызывает именно FileNotFoundError
         with self.assertRaises(FileNotFoundError):
@@ -301,7 +302,7 @@ class TestValidatorRobustness(unittest.TestCase):
             rules_path=FIXTURES_DIR / "malformed.json",
             log_level=LogLevel.CRITICAL,
             is_quiet=True,
-            stop_on_first_fail=False,
+            exit_on_first_error=False,
         )
         with self.assertRaises(RuleParsingError):
             validator = StaticValidator(config, self.console)
@@ -328,6 +329,7 @@ class TestValidatorRobustness(unittest.TestCase):
         }
         rules_path = FIXTURES_DIR / "temp_arcade_rules.json"
         with open(rules_path, "w", encoding="utf-8") as f:
+            # noinspection PyTypeChecker
             json.dump(arcade_rules, f)
 
         result = self.run_validator("p09_arcade_app.py", str(rules_path))
