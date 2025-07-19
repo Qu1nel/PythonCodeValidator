@@ -18,13 +18,13 @@ Unreleased
 Added
 -----
 
-- *Docstring for output.py:trace function:* Google style docstring for log message of TRACE level.
+- *...*
 
 
 Changed
 -------
 
-- *Add D107 to ignore* for `factories.py` file.
+- *...*
 
 
 Deprecated
@@ -49,6 +49,35 @@ Security
 --------
 
 - *...*
+
+
+
+v0.3.0 - 2025-07-19
+===================
+
+Added
+-----
+
+- Added the command line option ``--max-messages N`` to limit the number of error messages displayed.
+- Added the command line option ``-x, --exit-on-first-error`` for immediate exit after the first detected error.
+
+
+Changed
+-------
+
+- **[Breaking Change]** The "``--stop-on-first-fail`` option has been renamed to ``--exit-on-first-error``" for greater clarity.
+
+
+Removed
+-------
+
+- **[Breaking Change]** The ``--stop-on-first-fail`` command line option has been removed.
+
+
+Fixed
+-----
+
+- Improved handling of critical errors such as missing file. Now the application displays a clear message to the user instead of crashing with an error, and detailed debugging information is saved in the logs.
 
 
 
