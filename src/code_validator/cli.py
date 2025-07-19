@@ -49,9 +49,14 @@ def setup_arg_parser() -> argparse.ArgumentParser:
             "Default: ERROR."
         ),
     )
-    parser.add_argument("--silent", action="store_true", help="Suppress stdout output, show only logs.")
+    parser.add_argument(
+        "--quiet",
+        action="store_true",
+        help="Suppress all stdout output (validation errors and final verdict)."
+    )
+    parser.add_argument("--no-verdict", action="store_true", help="Suppress stdout output verdict, show failed rules.")
     parser.add_argument("--stop-on-first-fail", action="store_true", help="Stop after the first failed rule.")
-    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
+    parser.add_argument("--version", "-v", action="version", version=f"%(prog)s {__version__}")
     return parser
 
 
@@ -72,13 +77,14 @@ def run_from_cli() -> None:
     parser = setup_arg_parser()
     args = parser.parse_args()
 
-    logger = setup_logging(args.log_level)
-    console = Console(logger, is_silent=args.silent)
+    logger = setup_logging(args.log)
+    console = Console(logger, is_quiet=args.quiet, show_verdict=not args.no_verdict)
+    console.print(f"Level of logging: {args.log}", level=LogLevel.DEBUG)
     config = AppConfig(
         solution_path=args.solution_path,
         rules_path=args.rules_path,
-        log_level=args.log_level,
-        is_silent=args.silent,
+        log_level=args.log,
+        is_quiet=args.quiet,
         stop_on_first_fail=args.stop_on_first_fail,
     )
 

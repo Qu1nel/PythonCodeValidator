@@ -41,14 +41,14 @@ class AppConfig:
         solution_path: The file path to the Python solution to be validated.
         rules_path: The file path to the JSON rules file.
         log_level: The minimum logging level for console output.
-        is_silent: If True, suppresses all non-log output to stdout.
+        is_quiet: If True, suppresses all non-log output to stdout.
         stop_on_first_fail: If True, halts validation after the first failed rule.
     """
 
     solution_path: Path
     rules_path: Path
     log_level: LogLevel
-    is_silent: bool
+    is_quiet: bool
     stop_on_first_fail: bool
 
 
