@@ -24,7 +24,7 @@ Added
 Changed
 -------
 
-- *The internal logic of creating rules has been optimized:* Redundant configuration conversion has been eliminated, making the process more efficient.
+- *...*
 
 
 Deprecated
