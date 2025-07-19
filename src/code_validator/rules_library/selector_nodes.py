@@ -13,7 +13,7 @@ from typing import Any
 from ..components.ast_utils import get_full_name
 from ..components.definitions import Selector
 from ..components.scope_handler import find_scope_node
-from ..output import log_initialization, LogLevel
+from ..output import LogLevel, log_initialization
 
 
 class ScopedSelector(Selector):

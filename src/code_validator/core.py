@@ -189,8 +189,9 @@ class StaticValidator:
             self._console.print("Lead source code, load and parse rules and parsing code - PASS", level=LogLevel.DEBUG)
 
         except (FileNotFoundError, RuleParsingError) as e:
-            self._console.print(f"In method `run` of 'StaticValidator' raised exception {e.__class__.__name__}",
-                                level=LogLevel.WARNING)
+            self._console.print(
+                f"In method `run` of 'StaticValidator' raised exception {e.__class__.__name__}", level=LogLevel.WARNING
+            )
             raise
 
         self._console.print("Starting check rules..", level=LogLevel.DEBUG)
@@ -202,9 +203,11 @@ class StaticValidator:
                 f"Executing rule: {rule.config.rule_id}"
                 + (
                     f" [{rule.config.check.selector.type}, {rule.config.check.constraint.type}, "
-                    f"is_critical={rule.config.is_critical}]" if not isinstance(rule.config, ShortRuleConfig) else ""
+                    f"is_critical={rule.config.is_critical}]"
+                    if not isinstance(rule.config, ShortRuleConfig)
+                    else ""
                 ),
-                level=LogLevel.INFO
+                level=LogLevel.INFO,
             )
             is_passed = rule.execute(self._ast_tree, self._source_code)
             if not is_passed:

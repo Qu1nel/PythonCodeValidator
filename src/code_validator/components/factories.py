@@ -10,8 +10,7 @@ rules file and instantiating the appropriate handler classes from the
 import dataclasses
 from typing import Any, Type, TypeVar
 
-from .definitions import Constraint, Rule, Selector
-from ..config import ConstraintConfig, FullRuleCheck, FullRuleConfig, SelectorConfig, ShortRuleConfig, LogLevel
+from ..config import ConstraintConfig, FullRuleCheck, FullRuleConfig, LogLevel, SelectorConfig, ShortRuleConfig
 from ..exceptions import RuleParsingError
 from ..output import Console, log_initialization
 from ..rules_library.basic_rules import CheckLinterRule, CheckSyntaxRule, FullRuleHandler
@@ -34,6 +33,7 @@ from ..rules_library.selector_nodes import (
     LiteralSelector,
     UsageSelector,
 )
+from .definitions import Constraint, Rule, Selector
 
 T = TypeVar("T")
 
@@ -122,7 +122,7 @@ class RuleFactory:
                 self._console.print(
                     f"Rule {rule_id} is general rule with: selector - "
                     f"{selector_cfg.type}, constraint - {raw_constraint_cfg['type']}",
-                    level=LogLevel.DEBUG
+                    level=LogLevel.DEBUG,
                 )
 
                 check_cfg = FullRuleCheck(selector=selector_cfg, constraint=constraint_cfg)

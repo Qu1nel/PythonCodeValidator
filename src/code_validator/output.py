@@ -8,7 +8,7 @@ controlled via configuration (e.g., log levels, silent mode).
 import logging
 import sys
 from functools import wraps
-from typing import Literal, Callable, TypeVar, ParamSpec, Concatenate
+from typing import Callable, Concatenate, Literal, ParamSpec, TypeVar
 
 from .config import LogLevel
 
@@ -65,7 +65,7 @@ def setup_logging(log_level: LogLevel) -> logging.Logger:
     Returns:
         The configured root logger instance.
     """
-    formatter = logging.Formatter(fmt=LOG_FORMAT, datefmt=DATE_FORMAT, style='{')
+    formatter = logging.Formatter(fmt=LOG_FORMAT, datefmt=DATE_FORMAT, style="{")
 
     handler = logging.StreamHandler(sys.stderr)
     handler.setFormatter(formatter)
@@ -86,9 +86,9 @@ T_self = TypeVar("T_self")
 
 
 def log_initialization(
-        level: LogLevel | Literal["TRACE", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = LogLevel.TRACE,
-        start_message: str = "Initializing {class_name}...",
-        end_message: str = "{class_name} initialized."
+    level: LogLevel | Literal["TRACE", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = LogLevel.TRACE,
+    start_message: str = "Initializing {class_name}...",
+    end_message: str = "{class_name} initialized.",
 ) -> Callable[[Callable[Concatenate[T_self, P], None]], Callable[Concatenate[T_self, P], None]]:
     """Decorator factory for logging the initialization of a class instance.
 
@@ -201,19 +201,15 @@ class Console:
         Returns:
             True if and only if the combined condition F holds, i.e. the message may be printed.
         """
-        return (
-                not self._is_quiet
-                and ((not is_verdict and show_user)
-                     or (is_verdict and self._show_verdict))
-        )
+        return not self._is_quiet and ((not is_verdict and show_user) or (is_verdict and self._show_verdict))
 
     def print(
-            self,
-            message: str,
-            *,
-            level: LogLevel | Literal["TRACE", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = LogLevel.TRACE,
-            is_verdict: bool = False,
-            show_user: bool = False,
+        self,
+        message: str,
+        *,
+        level: LogLevel | Literal["TRACE", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = LogLevel.TRACE,
+        is_verdict: bool = False,
+        show_user: bool = False,
     ) -> None:
         """Prints a message to stdout and logs it simultaneously.
 

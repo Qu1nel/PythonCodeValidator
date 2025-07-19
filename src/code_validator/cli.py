@@ -43,16 +43,10 @@ def setup_arg_parser() -> argparse.ArgumentParser:
         "--log",
         type=LogLevel,
         default=LogLevel.ERROR,
-        help=(
-            "Set the logging level for stderr "
-            "(TRACE, DEBUG, INFO, WARNING, ERROR, CRITICAL). "
-            "Default: ERROR."
-        ),
+        help=("Set the logging level for stderr (TRACE, DEBUG, INFO, WARNING, ERROR, CRITICAL). Default: ERROR."),
     )
     parser.add_argument(
-        "--quiet",
-        action="store_true",
-        help="Suppress all stdout output (validation errors and final verdict)."
+        "--quiet", action="store_true", help="Suppress all stdout output (validation errors and final verdict)."
     )
     parser.add_argument("--no-verdict", action="store_true", help="Suppress stdout output verdict, show failed rules.")
     parser.add_argument("--stop-on-first-fail", action="store_true", help="Stop after the first failed rule.")
@@ -105,7 +99,7 @@ def run_from_cli() -> None:
             sys.exit(ExitCode.VALIDATION_FAILED)
 
     except CodeValidatorError as e:
-        console.print(f"Error: Internal Error of validator!", level=LogLevel.CRITICAL)
+        console.print("Error: Internal Error of validator!", level=LogLevel.CRITICAL)
         logger.exception(f"Traceback for CodeValidatorError: {e}")
         sys.exit(ExitCode.VALIDATION_FAILED)
     except FileNotFoundError as e:
