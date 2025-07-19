@@ -52,6 +52,16 @@ Security
 
 
 
+v0.2.1 - 2025-07-19
+===================
+
+Changed
+-------
+
+- *The internal logic of creating rules has been optimized:* Redundant configuration conversion has been eliminated, making the process more efficient.
+
+
+
 v0.2.0 - 2025-07-19
 ===================
 
