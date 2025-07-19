@@ -25,6 +25,7 @@ class ExitCode(IntEnum):
 class LogLevel(StrEnum):
     """Defines the supported logging levels for the application."""
 
+    TRACE = "TRACE"
     DEBUG = "DEBUG"
     INFO = "INFO"
     WARNING = "WARNING"

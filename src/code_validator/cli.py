@@ -35,15 +35,19 @@ def setup_arg_parser() -> argparse.ArgumentParser:
         prog="validate-code",
         description="Validates a Python source file against a set of JSON rules.",
     )
+
     parser.add_argument("solution_path", type=Path, help="Path to the Python solution file to validate.")
     parser.add_argument("rules_path", type=Path, help="Path to the JSON file with validation rules.")
+
     parser.add_argument(
-        "-l",
-        "--log-level",
+        "--log",
         type=LogLevel,
-        choices=list(LogLevel),
-        default=LogLevel.WARNING,
-        help="Set the logging level (default: WARNING).",
+        default=LogLevel.ERROR,
+        help=(
+            "Set the logging level for stderr "
+            "(TRACE, DEBUG, INFO, WARNING, ERROR, CRITICAL). "
+            "Default: ERROR."
+        ),
     )
     parser.add_argument("--silent", action="store_true", help="Suppress stdout output, show only logs.")
     parser.add_argument("--stop-on-first-fail", action="store_true", help="Stop after the first failed rule.")
