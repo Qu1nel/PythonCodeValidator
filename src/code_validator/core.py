@@ -64,7 +64,7 @@ class StaticValidator:
         _source_code (str): The raw text content of the Python file being validated.
         _ast_tree (ast.Module | None): The Abstract Syntax Tree of the source code.
         _rules (list[Rule]): A list of initialized, executable rule objects.
-        _failed_rules (list[int]): A list of rule IDs that failed during the run.
+        _failed_rules (list[Rule]): A list of rules that contained IDs of failed checks during the run.
     """
 
     @log_initialization(level=LogLevel.DEBUG)
@@ -83,10 +83,10 @@ class StaticValidator:
         self._source_code: str = ""
         self._ast_tree: ast.Module | None = None
         self._rules: list[Rule] = []
-        self._failed_rules: list[int] = []
+        self._failed_rules: list[Rule] = []
 
     @property
-    def failed_rules_id(self) -> list[int]:
+    def failed_rules_id(self) -> list[Rule]:
         """list[int]: A list of rule IDs that failed during the last run."""
         return self._failed_rules
 
@@ -161,7 +161,7 @@ class StaticValidator:
                 if getattr(rule.config, "type", None) == "check_syntax":
                     self._console.print(rule.config.message, level=LogLevel.ERROR, show_user=True)
                     self._console.print(f"Failed rule id: {rule.config.rule_id}", level=LogLevel.DEBUG)
-                    self._failed_rules.append(rule.config.rule_id)
+                    self._failed_rules.append(rule)
                     return False
             self._console.print(f"Syntax Error found: {e}", level=LogLevel.ERROR)
             return False
@@ -211,7 +211,8 @@ class StaticValidator:
             )
             is_passed = rule.execute(self._ast_tree, self._source_code)
             if not is_passed:
-                self._console.print(rule.config.message, level=LogLevel.WARNING, show_user=True)
+                self._failed_rules.append(rule)
+                # self._console.print(rule.config.message, level=LogLevel.WARNING, show_user=True)
                 self._console.print(f"Rule {rule.config.rule_id} - FAIL", level=LogLevel.INFO)
                 self._failed_rules.append(rule.config.rule_id)
                 if getattr(rule.config, "is_critical", False) or self._config.stop_on_first_fail:

@@ -43,13 +43,19 @@ def setup_arg_parser() -> argparse.ArgumentParser:
         "--log",
         type=LogLevel,
         default=LogLevel.ERROR,
-        help=("Set the logging level for stderr (TRACE, DEBUG, INFO, WARNING, ERROR, CRITICAL). Default: ERROR."),
+        help="Set the logging level for stderr (TRACE, DEBUG, INFO, WARNING, ERROR, CRITICAL). Default: ERROR.",
     )
     parser.add_argument(
         "--quiet", action="store_true", help="Suppress all stdout output (validation errors and final verdict)."
     )
     parser.add_argument("--no-verdict", action="store_true", help="Suppress stdout output verdict, show failed rules.")
-    parser.add_argument("--stop-on-first-fail", action="store_true", help="Stop after the first failed rule.")
+    parser.add_argument(
+        "--max-messages",
+        type=int,
+        default=0,
+        metavar="N",
+        help="Maximum number of error messages to display. 0 for no limit. Default: 0.",
+    )
     parser.add_argument("--version", "-v", action="version", version=f"%(prog)s {__version__}")
     return parser
 
@@ -79,7 +85,7 @@ def run_from_cli() -> None:
         rules_path=args.rules_path,
         log_level=args.log,
         is_quiet=args.quiet,
-        stop_on_first_fail=args.stop_on_first_fail,
+        max_messages=args.max_messages,
     )
     console.print(f"Config is: {config}", level=LogLevel.TRACE)
 

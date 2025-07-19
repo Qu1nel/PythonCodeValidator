@@ -43,13 +43,15 @@ class AppConfig:
         log_level: The minimum logging level for console output.
         is_quiet: If True, suppresses all non-log output to stdout.
         stop_on_first_fail: If True, halts validation after the first failed rule.
+        exit_on_first_error: If True, halts validation after the first failed rule.
     """
 
     solution_path: Path
     rules_path: Path
     log_level: LogLevel
     is_quiet: bool
-    stop_on_first_fail: bool
+    exit_on_first_error: bool
+    max_messages: int
 
 
 @dataclass(frozen=True)
