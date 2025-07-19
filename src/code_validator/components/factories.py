@@ -116,9 +116,8 @@ class RuleFactory:
                 selector_cfg = _create_dataclass_from_dict(SelectorConfig, raw_selector_cfg)
                 constraint_cfg = _create_dataclass_from_dict(ConstraintConfig, raw_constraint_cfg)
 
-                # TODO: оптимизировать (в create создается конфиг) = 1
-                selector = self._selector_factory.create(raw_selector_cfg)
-                constraint = self._constraint_factory.create(raw_constraint_cfg)
+                selector = self._selector_factory.create(selector_cfg)
+                constraint = self._constraint_factory.create(constraint_cfg)
 
                 self._console.print(
                     f"Rule {rule_id} is general rule with: selector - "
@@ -185,20 +184,18 @@ class SelectorFactory:
         pass
 
     @staticmethod
-    def create(selector_config: dict[str, Any]) -> Selector:
+    def create(config: SelectorConfig) -> Selector:
         """Creates a specific selector instance based on its type.
 
         This method uses the 'type' field from the selector configuration
         to determine which concrete Selector class to instantiate.
 
         Args:
-            selector_config: The 'selector' block from a JSON rule.
+            config: The 'selector' block from a JSON rule.
 
         Returns:
             An instance of a class that conforms to the Selector protocol.
         """
-        config = _create_dataclass_from_dict(SelectorConfig, selector_config)  # TODO (1)
-
         match config.type:
             case "function_def":
                 return FunctionDefSelector(name=config.name, in_scope_config=config.in_scope)
@@ -234,20 +231,18 @@ class ConstraintFactory:
         pass
 
     @staticmethod
-    def create(constraint_config: dict[str, Any]) -> Constraint:
+    def create(config: ConstraintConfig) -> Constraint:
         """Creates a specific constraint instance based on its type.
 
         This method uses the 'type' field from the constraint configuration
         to determine which concrete Constraint class to instantiate.
 
         Args:
-            constraint_config: The 'constraint' block from a JSON rule.
+            config: The 'constraint' block from a JSON rule.
 
         Returns:
             An instance of a class that conforms to the Constraint protocol.
         """
-        config = _create_dataclass_from_dict(ConstraintConfig, constraint_config)  # TODO (1)
-
         match config.type:
             case "is_required":
                 return IsRequiredConstraint(count=config.count)
