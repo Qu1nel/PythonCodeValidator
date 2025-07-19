@@ -214,9 +214,11 @@ class StaticValidator:
                 self._failed_rules.append(rule)
                 # self._console.print(rule.config.message, level=LogLevel.WARNING, show_user=True)
                 self._console.print(f"Rule {rule.config.rule_id} - FAIL", level=LogLevel.INFO)
-                self._failed_rules.append(rule.config.rule_id)
-                if getattr(rule.config, "is_critical", False) or self._config.stop_on_first_fail:
+                if getattr(rule.config, "is_critical", False):
                     self._console.print("Critical rule failed. Halting validation.", level=LogLevel.WARNING)
+                    break
+                elif self._config.exit_on_first_error:
+                    self._console.print("Exiting on first error.", level=LogLevel.INFO)
                     break
             else:
                 self._console.print(f"Rule {rule.config.rule_id} - PASS", level=LogLevel.INFO)

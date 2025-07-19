@@ -56,6 +56,9 @@ def setup_arg_parser() -> argparse.ArgumentParser:
         metavar="N",
         help="Maximum number of error messages to display. 0 for no limit. Default: 0.",
     )
+    parser.add_argument(
+        "-x", "--exit-on-first-error", action="store_true", help="Exit instantly on the first error found."
+    )
     parser.add_argument("--version", "-v", action="version", version=f"%(prog)s {__version__}")
     return parser
 
@@ -85,6 +88,7 @@ def run_from_cli() -> None:
         rules_path=args.rules_path,
         log_level=args.log,
         is_quiet=args.quiet,
+        exit_on_first_error=args.exit_on_first_error,
         max_messages=args.max_messages,
     )
     console.print(f"Config is: {config}", level=LogLevel.TRACE)

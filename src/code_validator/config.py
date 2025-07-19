@@ -42,8 +42,8 @@ class AppConfig:
         rules_path: The file path to the JSON rules file.
         log_level: The minimum logging level for console output.
         is_quiet: If True, suppresses all non-log output to stdout.
-        stop_on_first_fail: If True, halts validation after the first failed rule.
         exit_on_first_error: If True, halts validation after the first failed rule.
+        max_messages: Maximum number of error messages to display. 0 for no limit. Default: 0.
     """
 
     solution_path: Path
