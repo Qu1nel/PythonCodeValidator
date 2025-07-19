@@ -15,7 +15,7 @@ class TestStaticValidatorIntegration(unittest.TestCase):
 
     def setUp(self):
         self.logger = setup_logging(LogLevel.CRITICAL)
-        self.console = Console(self.logger, is_silent=True)
+        self.console = Console(self.logger, is_quiet=True)
 
     def run_validator(self, solution_file: str, rules_file: str) -> bool:
         """Helper function to run the validator with specific files."""
@@ -23,7 +23,7 @@ class TestStaticValidatorIntegration(unittest.TestCase):
             solution_path=FIXTURES_DIR / solution_file,
             rules_path=FIXTURES_DIR / rules_file,
             log_level=LogLevel.CRITICAL,
-            is_silent=True,
+            is_quiet=True,
             stop_on_first_fail=False,
         )
         validator = StaticValidator(config, self.console)
@@ -80,7 +80,7 @@ class TestStaticValidatorIntegration(unittest.TestCase):
             solution_path=FIXTURES_DIR / "valid_code.py",
             rules_path=rules_path,
             log_level=LogLevel.CRITICAL,
-            is_silent=True,
+            is_quiet=True,
             stop_on_first_fail=False,
         )
         validator = StaticValidator(config, self.console)
@@ -164,7 +164,7 @@ class TestStaticValidatorIntegration(unittest.TestCase):
             solution_path=FIXTURES_DIR / "p01_simple_program.py",
             rules_path=rules_path,
             log_level=LogLevel.CRITICAL,
-            is_silent=True,
+            is_quiet=True,
             stop_on_first_fail=True,
         )
         validator = StaticValidator(config, self.console)
@@ -246,7 +246,7 @@ class TestValidatorRobustness(unittest.TestCase):
 
     def setUp(self):
         self.logger = setup_logging(LogLevel.CRITICAL)
-        self.console = Console(self.logger, is_silent=True)
+        self.console = Console(self.logger, is_quiet=True)
         self.valid_rules_path = FIXTURES_DIR / "r01_require_structure.json"
 
     def run_validator(self, solution_file: str, rules_file: str) -> bool:
@@ -255,7 +255,7 @@ class TestValidatorRobustness(unittest.TestCase):
             solution_path=FIXTURES_DIR / solution_file,
             rules_path=FIXTURES_DIR / rules_file,
             log_level=LogLevel.CRITICAL,
-            is_silent=True,
+            is_quiet=True,
             stop_on_first_fail=False,
         )
         validator = StaticValidator(config, self.console)
@@ -272,7 +272,7 @@ class TestValidatorRobustness(unittest.TestCase):
             solution_path=FIXTURES_DIR / "empty.py",
             rules_path=self.valid_rules_path,
             log_level=LogLevel.CRITICAL,
-            is_silent=True,
+            is_quiet=True,
             stop_on_first_fail=False,
         )
         # Ожидаем, что проверка провалится (т.к. в пустом файле нет нужных функций),
@@ -286,7 +286,7 @@ class TestValidatorRobustness(unittest.TestCase):
             solution_path=FIXTURES_DIR / "non_existent_file.py",
             rules_path=self.valid_rules_path,
             log_level=LogLevel.CRITICAL,
-            is_silent=True,
+            is_quiet=True,
             stop_on_first_fail=False,
         )
         # Проверяем, что вызов .run() вызывает именно FileNotFoundError
@@ -300,7 +300,7 @@ class TestValidatorRobustness(unittest.TestCase):
             solution_path=FIXTURES_DIR / "valid_code.py",
             rules_path=FIXTURES_DIR / "malformed.json",
             log_level=LogLevel.CRITICAL,
-            is_silent=True,
+            is_quiet=True,
             stop_on_first_fail=False,
         )
         with self.assertRaises(RuleParsingError):
