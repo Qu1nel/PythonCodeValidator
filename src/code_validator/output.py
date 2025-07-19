@@ -26,6 +26,26 @@ logging.addLevelName(TRACE_LEVEL_NUM, "TRACE")
 
 
 def trace(self, message, *args, **kws):
+    """Logs a message with TRACE level (below DEBUG).
+
+    This method allows logging messages with a custom TRACE level,
+    defined at level number 5. It only emits the log if the logger
+    is enabled for this level.
+
+    To enable usage, attach this method to the `logging.Logger` class:
+
+        logging.Logger.trace = trace
+
+    Args:
+        self: logger instance.
+        message: The log message format string.
+        *args: Arguments to be merged into the message format string.
+        **kws: Optional keyword arguments passed to the logger,
+               e.g., `exc_info`, `stacklevel`, or `extra`.
+
+    Returns:
+        None
+    """
     if self.isEnabledFor(TRACE_LEVEL_NUM):
         self._log(TRACE_LEVEL_NUM, message, args, **kws)
 

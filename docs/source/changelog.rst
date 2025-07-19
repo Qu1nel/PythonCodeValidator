@@ -18,13 +18,13 @@ Unreleased
 Added
 -----
 
-- *...*
+- *Docstring for output.py:trace function:* Google style docstring for log message of TRACE level.
 
 
 Changed
 -------
 
-- *...*
+- *Add D107 to ignore* for `factories.py` file.
 
 
 Deprecated

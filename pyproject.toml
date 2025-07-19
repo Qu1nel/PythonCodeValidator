@@ -96,6 +96,7 @@ ignore = []
 ]
 "src/code_validator/components/__init__.py" = ["D104"]
 "src/code_validator/rules_library/__init__.py" = ["D104"]
+"src/code_validator/components/factories.py" = ["D107"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
