@@ -54,7 +54,7 @@ class IsRequiredConstraint(Constraint):
                           scope_config: dict[str, Any] | str,
                           ast_tree: ast.Module,
                           file_path: str,
-                          console) -> bool:
+                          console) -> tuple[bool, str | None]:
         """Enhanced check with typo detection support.
         
         Performs the standard constraint check, and if it fails due to no nodes
@@ -69,26 +69,27 @@ class IsRequiredConstraint(Constraint):
             console: Console instance for output
             
         Returns:
-            True if constraint passes, False otherwise
+            Tuple of (constraint_result, typo_suggestion_message)
         """
         # Perform standard check first
         standard_result = self.check(nodes)
         
         # If check fails and no nodes found, try typo detection
         if not standard_result and len(nodes) == 0 and target_name:
-            self._analyze_typo_and_suggest(
+            typo_suggestion = self._analyze_typo_and_suggest(
                 target_name, scope_config, ast_tree, file_path, console
             )
+            return standard_result, typo_suggestion
         
-        return standard_result
+        return standard_result, None
     
     def _analyze_typo_and_suggest(self,
                                  target_name: str,
                                  scope_config: dict[str, Any] | str,
                                  ast_tree: ast.Module,
                                  file_path: str,
-                                 console) -> None:
-        """Analyze potential typos and log suggestions.
+                                 console) -> str | None:
+        """Analyze potential typos and return suggestion message.
         
         Args:
             target_name: The name that was being searched for
@@ -96,6 +97,9 @@ class IsRequiredConstraint(Constraint):
             ast_tree: The complete AST tree for analysis
             file_path: Path to the source file
             console: Console instance for output
+            
+        Returns:
+            User-friendly typo suggestion message or None if no suggestion
         """
         try:
             # Lazy import to avoid circular dependencies
@@ -111,12 +115,16 @@ class IsRequiredConstraint(Constraint):
             # Log debug information
             console.print(suggestion.debug_info, level=LogLevel.DEBUG)
             
-            # If we have a good suggestion, enhance the error message
+            # If we have a good suggestion, return full formatted message
             if suggestion.has_suggestion:
+                # Log detailed suggestion for debugging
                 console.print(
                     f"Typo suggestion: {suggestion.message}", 
                     level=LogLevel.INFO
                 )
+                
+                # Return full formatted message for user display
+                return suggestion.message
                 
         except Exception as e:
             # Don't let typo detection break the main validation
@@ -124,6 +132,8 @@ class IsRequiredConstraint(Constraint):
                 f"Typo detection failed: {e}", 
                 level=LogLevel.DEBUG
             )
+        
+        return None
 
 
 class IsForbiddenConstraint(Constraint):

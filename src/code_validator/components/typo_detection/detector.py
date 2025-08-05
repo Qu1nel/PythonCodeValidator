@@ -154,7 +154,8 @@ class TypoDetector:
         # Return best suggestion if it meets confidence threshold
         if suggestions and suggestions[0].confidence >= self.min_confidence:
             best_match = suggestions[0]
-            message = self.message_formatter.format_suggestion(
+            # self.message_formatter.format_suggestion | _compact
+            message = self.message_formatter.format_suggestion_compact(
                 target_name, best_match, file_path, scope_config
             )
             

@@ -35,8 +35,8 @@ class Hero(arcade.Sprite):
         self.is_walking = False
         self.face_direction = FaceDirection.RIGHT
 
-        self.center_x = SCREEN_WIDTH // 2
-        self.center_y = SCREEN_HEIGHT // 2
+        self.cener_x = SCREEN_WIDTH // 2
+        self.cener_y = SCREEN_HEIGHT // 2
 
     def update_animation(self, delta_time: float = 1 / 60, **kwargs):
         if self.is_walking:

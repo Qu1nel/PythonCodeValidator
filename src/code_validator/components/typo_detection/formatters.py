@@ -48,6 +48,34 @@ class PythonStyleFormatter:
         Note: This is a suggestion based on similarity analysis.
     """
     
+    def format_suggestion_compact(self,
+                                 target_name: str,
+                                 best_match: SuggestionMatch,
+                                 file_path: str,
+                                 scope_config: dict[str, Any] | str) -> str:
+        """Format a compact typo suggestion in Russian for user display.
+        
+        Args:
+            target_name: The name that was being searched for
+            best_match: The best matching candidate found
+            file_path: Path to the source file
+            scope_config: Scope configuration for context
+            
+        Returns:
+            Compact formatted suggestion message in Russian
+        """
+        candidate = best_match.candidate
+        scope_context = self._format_scope_context_ru(scope_config)
+        
+        # Read source line for highlighting
+        source_line = self._get_source_line(file_path, candidate.line_number)
+        highlight = self._create_highlight(candidate.col_offset, candidate.end_col_offset)
+        
+        return f"""💡 Найдено похожее в {scope_context} (строка {candidate.line_number}):
+{source_line}
+{highlight}
+Возможно, вы имели в виду '{target_name}' вместо '{candidate.name}'?"""
+
     def format_suggestion(self, 
                          target_name: str,
                          best_match: SuggestionMatch,
@@ -75,7 +103,7 @@ class PythonStyleFormatter:
         return f"""File "{file_path}", line {candidate.line_number}, in {scope_context}
     {source_line}
     {highlight}
-ValidationError: Required attribute '{target_name}' not found in {scope_context}. 
+ValidationError: Required attribute '{target_name}' not found in {scope_context}.
 Did you mean '{target_name}' instead of '{candidate.name}'?
 
 Note: This is a suggestion based on similarity analysis."""
@@ -112,6 +140,27 @@ Note: This is a suggestion based on similarity analysis."""
         
         return "\n".join(lines)
     
+    def _format_scope_context_ru(self, scope_config: dict[str, Any] | str) -> str:
+        """Format scope configuration into a readable Russian context string.
+        
+        Args:
+            scope_config: Scope configuration dict or string
+            
+        Returns:
+            Human-readable scope context in Russian
+        """
+        if isinstance(scope_config, str):
+            return "глобальной области" if scope_config == "global" else scope_config
+        
+        if 'class' in scope_config and 'method' in scope_config:
+            return f"{scope_config['class']}.{scope_config['method']}"
+        elif 'class' in scope_config:
+            return f"классе {scope_config['class']}"
+        elif 'function' in scope_config:
+            return f"функции {scope_config['function']}"
+        else:
+            return "глобальной области"
+
     def _format_scope_context(self, scope_config: dict[str, Any] | str) -> str:
         """Format scope configuration into a readable context string.
         

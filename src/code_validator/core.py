@@ -179,12 +179,14 @@ class StaticValidator:
         and the display limit from `self._config`. All user-facing output is
         channeled through the `self._console` object.
 
+        Enhanced with numbered error messages and typo suggestions for better UX.
+
         It performs the following steps:
           1. Checks if any errors were recorded. If not, it returns immediately.
           2. Determines the subset of errors to display based on the configured
              `max_messages` limit (a value of 0 means no limit).
           3. Iterates through the selected error rules and prints their
-             failure messages.
+             numbered failure messages with typo suggestions if available.
           4. If the error list was truncated, prints a summary line, e.g.,
              "... (5 more errors found)".
         """
@@ -198,8 +200,20 @@ class StaticValidator:
         if 0 < max_errors < num_errors:
             errors_to_show = self._failed_rules[:max_errors]
 
-        for rule in errors_to_show:
-            self._console.print(rule.config.message, level=LogLevel.WARNING, show_user=True)
+        for i, rule in enumerate(errors_to_show, 1):
+            # Print numbered error message
+            self._console.print(f"{i}. {rule.config.message}", level=LogLevel.WARNING, show_user=True)
+            
+            # Print typo suggestion if available
+            if hasattr(rule, 'typo_suggestion') and rule.typo_suggestion:
+                # Add 4-space indentation to each line of the suggestion
+                suggestion_lines = rule.typo_suggestion.split('\n')
+                for line in suggestion_lines:
+                    self._console.print(f"    {line}", level=LogLevel.WARNING, show_user=True)
+                
+                # Add empty line after suggestion for better readability
+                if i < len(errors_to_show):  # Don't add empty line after last error
+                    self._console.print("", level=LogLevel.WARNING, show_user=True)
 
         if 0 < max_errors < num_errors:
             remaining_count = num_errors - max_errors

@@ -37,6 +37,7 @@ class CheckSyntaxRule(Rule):
         """
         self.config = config
         self._console = console
+        self.typo_suggestion: str | None = None
 
     def execute(self, tree: ast.Module | None, source_code: str | None = None) -> bool:
         """Confirms that syntax is valid.
@@ -63,6 +64,7 @@ class CheckLinterRule(Rule):
         """Initializes a PEP8 linter check rule handler."""
         self.config = config
         self._console = console
+        self.typo_suggestion: str | None = None
 
     def execute(self, tree: ast.Module | None, source_code: str | None = None) -> bool:
         """Executes the flake8 linter on the source code via a subprocess.
@@ -152,6 +154,7 @@ class FullRuleHandler(Rule):
         self._selector = selector
         self._constraint = constraint
         self._console = console
+        self.typo_suggestion: str | None = None
 
     def execute(self, tree: ast.Module | None, source_code: str | None = None) -> bool:
         """Executes the rule by running the selector and applying the constraint.
@@ -177,7 +180,7 @@ class FullRuleHandler(Rule):
             # Get file path from console context if available
             file_path = getattr(self._console, '_current_file_path', '<unknown>')
             
-            return self._constraint.check_with_context(
+            context_result = self._constraint.check_with_context(
                 selected_nodes, 
                 target_name=self.config.check.selector.name,
                 scope_config=self.config.check.selector.in_scope,
@@ -185,5 +188,14 @@ class FullRuleHandler(Rule):
                 file_path=file_path,
                 console=self._console
             )
+            
+            # Handle both old (bool) and new (tuple) return formats
+            if isinstance(context_result, tuple):
+                result, typo_suggestion = context_result
+                self.typo_suggestion = typo_suggestion
+                return result
+            else:
+                # Old format - just boolean result
+                return context_result
         else:
             return self._constraint.check(selected_nodes)

@@ -23,6 +23,9 @@ Added
 - **[feat:typo] Python 3.11+ style error messages** - Added formatted error messages with file location, source highlighting, and typo suggestions
 - **[feat:typo] Semantic similarity scoring** - Enhanced confidence calculation with prefix/suffix matching and contextual relevance analysis
 - **[feat:typo] Integration with IsRequiredConstraint** - Automatic typo suggestions when validation rules fail to find required elements
+- **[feat:ux] Enhanced error reporting with numbered messages** - Added numbered error messages (1., 2., 3.) for better readability
+- **[feat:ux] User-visible typo suggestions** - Typo suggestions now appear in user output instead of debug logs only
+- **[feat:ux] Compact Russian typo format** - Created user-friendly Russian format for typo suggestions with proper indentation
 
 
 Changed

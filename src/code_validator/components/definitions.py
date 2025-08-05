@@ -69,9 +69,11 @@ class Rule(Protocol):
     Attributes:
         config: The dataclass object holding the configuration for this rule,
             parsed from the JSON file.
+        typo_suggestion: Optional typo suggestion message for user display.
     """
 
     config: FullRuleConfig | ShortRuleConfig
+    typo_suggestion: str | None
 
     def execute(self, tree: ast.Module | None, source_code: str | None = None) -> bool:
         """Executes the validation rule.
