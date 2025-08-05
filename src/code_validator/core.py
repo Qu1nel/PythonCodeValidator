@@ -238,6 +238,9 @@ class StaticValidator:
             )
             raise
 
+        # Set current file path for typo detection context
+        self._console.set_current_file_path(str(self._config.solution_path))
+        
         self._console.print("Starting check rules..", level=LogLevel.DEBUG)
         for rule in self._rules:
             if getattr(rule.config, "type", None) == "check_syntax":

@@ -171,6 +171,7 @@ class Console:
         self._is_quiet = is_quiet
         self._show_verdict = show_verdict
         self._stdout = sys.stdout
+        self._current_file_path: str = "<unknown>"  # For typo detection context
 
     def should_print(self, is_verdict: bool, show_user: bool) -> bool:
         """Decides whether a message should be printed to stdout based on console flags.
@@ -236,3 +237,11 @@ class Console:
 
         if (not self._is_quiet) and ((not is_verdict and show_user) or (is_verdict and self._show_verdict)):
             print(message, file=self._stdout)
+    
+    def set_current_file_path(self, file_path: str) -> None:
+        """Set the current file path for typo detection context.
+        
+        Args:
+            file_path: Path to the file currently being validated
+        """
+        self._current_file_path = file_path

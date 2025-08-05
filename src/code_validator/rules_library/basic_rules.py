@@ -171,4 +171,19 @@ class FullRuleHandler(Rule):
         selected_nodes = self._selector.select(tree)
 
         self._console.print(f"Applying constraint: {self._constraint.__class__.__name__}", level=LogLevel.TRACE)
-        return self._constraint.check(selected_nodes)
+        
+        # Check if constraint supports typo detection context
+        if hasattr(self._constraint, 'check_with_context'):
+            # Get file path from console context if available
+            file_path = getattr(self._console, '_current_file_path', '<unknown>')
+            
+            return self._constraint.check_with_context(
+                selected_nodes, 
+                target_name=self.config.check.selector.name,
+                scope_config=self.config.check.selector.in_scope,
+                ast_tree=tree,
+                file_path=file_path,
+                console=self._console
+            )
+        else:
+            return self._constraint.check(selected_nodes)
