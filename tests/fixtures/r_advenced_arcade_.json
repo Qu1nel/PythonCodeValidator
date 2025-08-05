@@ -1,0 +1,580 @@
+{
+  "description": "Полный набор правил для валидации игры на Arcade с классами Hero, Bullet, MyGame и функцией setup_game.",
+  "validation_rules": [
+    {
+      "rule_id": 1,
+      "type": "check_syntax",
+      "message": "Синтаксическая ошибка в коде."
+    },
+    {
+      "rule_id": 2,
+      "message": "Необходимо импортировать модуль 'enum'.",
+      "check": {
+        "selector": {
+          "type": "import_statement",
+          "name": "enum"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 3,
+      "message": "Необходимо импортировать модуль 'math'.",
+      "check": {
+        "selector": {
+          "type": "import_statement",
+          "name": "math"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 4,
+      "message": "Необходимо импортировать модуль 'arcade'.",
+      "check": {
+        "selector": {
+          "type": "import_statement",
+          "name": "arcade"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 5,
+      "message": "Должна быть определена глобальная константа 'SCREEN_WIDTH'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "SCREEN_WIDTH",
+          "in_scope": "global"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 6,
+      "message": "Константа 'SCREEN_WIDTH' должна быть числом.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "SCREEN_WIDTH"
+        },
+        "constraint": {
+          "type": "must_be_type",
+          "expected_type": "int"
+        }
+      }
+    },
+    {
+      "rule_id": 7,
+      "message": "Должна быть определена глобальная константа 'SCREEN_HEIGHT'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "SCREEN_HEIGHT",
+          "in_scope": "global"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 8,
+      "message": "Константа 'SCREEN_HEIGHT' должна быть числом.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "SCREEN_HEIGHT"
+        },
+        "constraint": {
+          "type": "must_be_type",
+          "expected_type": "int"
+        }
+      }
+    },
+    {
+      "rule_id": 9,
+      "message": "Должна быть определена глобальная константа 'SCREEN_TITLE'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "SCREEN_TITLE",
+          "in_scope": "global"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 10,
+      "message": "Константа 'SCREEN_TITLE' должна быть строкой.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "SCREEN_TITLE"
+        },
+        "constraint": {
+          "type": "must_be_type",
+          "expected_type": "str"
+        }
+      }
+    },
+    {
+      "rule_id": 11,
+      "message": "Должен быть определен класс 'FaceDirection'.",
+      "check": {
+        "selector": {
+          "type": "class_def",
+          "name": "FaceDirection"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 12,
+      "message": "Класс 'FaceDirection' должен наследоваться от 'enum.Enum'.",
+      "check": {
+        "selector": {
+          "type": "class_def",
+          "name": "FaceDirection"
+        },
+        "constraint": {
+          "type": "must_inherit_from",
+          "parent_name": "enum.Enum"
+        }
+      }
+    },
+    {
+      "rule_id": 13,
+      "message": "Должен быть определен класс 'Hero'.",
+      "check": {
+        "selector": {
+          "type": "class_def",
+          "name": "Hero"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 14,
+      "message": "Класс 'Hero' должен наследоваться от 'arcade.Sprite'.",
+      "check": {
+        "selector": {
+          "type": "class_def",
+          "name": "Hero"
+        },
+        "constraint": {
+          "type": "must_inherit_from",
+          "parent_name": "arcade.Sprite"
+        }
+      }
+    },
+    {
+      "rule_id": 15,
+      "message": "В конструкторе класса 'Hero' должен создаваться атрибут 'self.scale'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "self.scale",
+          "in_scope": {
+            "class": "Hero",
+            "method": "__init__"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 16,
+      "message": "В конструкторе класса 'Hero' должен создаваться атрибут 'self.speed'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "self.speed",
+          "in_scope": {
+            "class": "Hero",
+            "method": "__init__"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 17,
+      "message": "В конструкторе класса 'Hero' должен создаваться атрибут 'self.health'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "self.health",
+          "in_scope": {
+            "class": "Hero",
+            "method": "__init__"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 18,
+      "message": "В конструкторе класса 'Hero' должен создаваться атрибут 'self.face_direction'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "self.face_direction",
+          "in_scope": {
+            "class": "Hero",
+            "method": "__init__"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 19,
+      "message": "В конструкторе класса 'Hero' должен создаваться атрибут 'self.center_x'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "self.center_x",
+          "in_scope": {
+            "class": "Hero",
+            "method": "__init__"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 20,
+      "message": "В конструкторе класса 'Hero' должен создаваться атрибут 'self.center_y'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "self.center_y",
+          "in_scope": {
+            "class": "Hero",
+            "method": "__init__"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 21,
+      "message": "Должен быть определен класс 'Bullet'.",
+      "check": {
+        "selector": {
+          "type": "class_def",
+          "name": "Bullet"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 22,
+      "message": "Класс 'Bullet' должен наследоваться от 'arcade.Sprite'.",
+      "check": {
+        "selector": {
+          "type": "class_def",
+          "name": "Bullet"
+        },
+        "constraint": {
+          "type": "must_inherit_from",
+          "parent_name": "arcade.Sprite"
+        }
+      }
+    },
+    {
+      "rule_id": 23,
+      "message": "В конструкторе класса 'Bullet' должен создаваться атрибут 'self.speed'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "self.speed",
+          "in_scope": {
+            "class": "Bullet",
+            "method": "__init__"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 24,
+      "message": "В конструкторе класса 'Bullet' должен создаваться атрибут 'self.damage'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "self.damage",
+          "in_scope": {
+            "class": "Bullet",
+            "method": "__init__"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 25,
+      "message": "В конструкторе класса 'Bullet' должен создаваться атрибут 'self.change_x'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "self.change_x",
+          "in_scope": {
+            "class": "Bullet",
+            "method": "__init__"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 26,
+      "message": "В конструкторе класса 'Bullet' должен создаваться атрибут 'self.change_y'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "self.change_y",
+          "in_scope": {
+            "class": "Bullet",
+            "method": "__init__"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 27,
+      "message": "Должен быть определен класс 'MyGame'.",
+      "check": {
+        "selector": {
+          "type": "class_def",
+          "name": "MyGame"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 28,
+      "message": "Класс 'MyGame' должен наследоваться от 'arcade.Window'.",
+      "check": {
+        "selector": {
+          "type": "class_def",
+          "name": "MyGame"
+        },
+        "constraint": {
+          "type": "must_inherit_from",
+          "parent_name": "arcade.Window"
+        }
+      }
+    },
+    {
+      "rule_id": 29,
+      "message": "В методе 'setup' класса 'MyGame' должен создаваться атрибут 'self.player_list'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "self.player_list",
+          "in_scope": {
+            "class": "MyGame",
+            "method": "setup"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 30,
+      "message": "В методе 'setup' класса 'MyGame' должен создаваться атрибут 'self.wall_list'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "self.wall_list",
+          "in_scope": {
+            "class": "MyGame",
+            "method": "setup"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 31,
+      "message": "В методе 'setup' класса 'MyGame' должен создаваться атрибут 'self.bullet_list'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "self.bullet_list",
+          "in_scope": {
+            "class": "MyGame",
+            "method": "setup"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 32,
+      "message": "В методе 'setup' класса 'MyGame' должен создаваться атрибут 'self.player'.",
+      "check": {
+        "selector": {
+          "type": "assignment",
+          "name": "self.player",
+          "in_scope": {
+            "class": "MyGame",
+            "method": "setup"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 33,
+      "message": "Должна быть определена функция 'setup_game'.",
+      "check": {
+        "selector": {
+          "type": "function_def",
+          "name": "setup_game"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 34,
+      "message": "Функция 'setup_game' должна возвращать экземпляр 'MyGame'.",
+      "check": {
+        "selector": {
+          "type": "function_call",
+          "name": "MyGame",
+          "in_scope": {
+            "function": "setup_game"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 35,
+      "message": "Должна быть определена функция 'main'.",
+      "check": {
+        "selector": {
+          "type": "function_def",
+          "name": "main"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 35,
+      "message": "В функции 'main' должен создаваться экземпляр 'MyGame'.",
+      "check": {
+        "selector": {
+          "type": "function_call",
+          "name": "MyGame",
+          "in_scope": {
+            "function": "main"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 36,
+      "message": "В функции 'main' должен быть вызов 'arcade.run'.",
+      "check": {
+        "selector": {
+          "type": "function_call",
+          "name": "arcade.run",
+          "in_scope": {
+            "function": "main"
+          }
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 37,
+      "message": "Должна быть точка входа if __name__ == '__main__'.",
+      "check": {
+        "selector": {
+          "type": "ast_node",
+          "node_type": "If"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    },
+    {
+      "rule_id": 38,
+      "message": "Внутри точки входа должна вызываться функция 'main'.",
+      "check": {
+        "selector": {
+          "type": "function_call",
+          "name": "main",
+          "in_scope": "global"
+        },
+        "constraint": {
+          "type": "is_required"
+        }
+      }
+    }
+  ]
+}

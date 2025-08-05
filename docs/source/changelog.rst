@@ -42,7 +42,8 @@ Removed
 Fixed
 -----
 
-- *...*
+- **[Critical Bug]** Fixed scope validation bug where selectors were not receiving proper scope configuration from the factory, causing rules to search in wrong scopes or ignore scope restrictions entirely.
+- **[Scope Logic]** Improved global scope handling for different selector types: assignments now only search at module level, while function calls include ``if __name__ == "__main__"`` blocks.
 
 
 Security

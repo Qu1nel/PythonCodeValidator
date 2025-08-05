@@ -198,21 +198,21 @@ class SelectorFactory:
         """
         match config.type:
             case "function_def":
-                return FunctionDefSelector(name=config.name, in_scope_config=config.in_scope)
+                return FunctionDefSelector(name=config.name, in_scope=config.in_scope)
             case "class_def":
-                return ClassDefSelector(name=config.name, in_scope_config=config.in_scope)
+                return ClassDefSelector(name=config.name, in_scope=config.in_scope)
             case "import_statement":
-                return ImportStatementSelector(name=config.name, in_scope_config=config.in_scope)
+                return ImportStatementSelector(name=config.name, in_scope=config.in_scope)
             case "function_call":
-                return FunctionCallSelector(name=config.name, in_scope_config=config.in_scope)
+                return FunctionCallSelector(name=config.name, in_scope=config.in_scope)
             case "assignment":
-                return AssignmentSelector(name=config.name, in_scope_config=config.in_scope)
+                return AssignmentSelector(name=config.name, in_scope=config.in_scope)
             case "usage":
-                return UsageSelector(name=config.name, in_scope_config=config.in_scope)
+                return UsageSelector(name=config.name, in_scope=config.in_scope)
             case "literal":
-                return LiteralSelector(name=config.name, in_scope_config=config.in_scope)
+                return LiteralSelector(name=config.name, in_scope=config.in_scope)
             case "ast_node":
-                return AstNodeSelector(node_type=config.node_type, in_scope_config=config.in_scope)
+                return AstNodeSelector(node_type=config.node_type, in_scope=config.in_scope)
             case _:
                 raise RuleParsingError(f"Unknown selector type: '{config.type}'")
 
