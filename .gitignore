@@ -195,3 +195,4 @@ cython_debug/
 
 # Development planning files
 IMPROVEMENT_PLAN.md
+DEVELOPER_GUIDE.md
