@@ -23,7 +23,7 @@ class IsRequiredConstraint(Constraint):
 
     This constraint is used to enforce the presence of a required language
     construct. It can also check for an exact number of occurrences.
-    
+
     Supports smart typo detection when no nodes are found - analyzes similar
     names in the same scope and provides helpful suggestions.
 
@@ -47,19 +47,21 @@ class IsRequiredConstraint(Constraint):
         if self.expected_count is not None:
             return len(nodes) == self.expected_count
         return len(nodes) > 0
-    
-    def check_with_context(self, 
-                          nodes: list[ast.AST],
-                          target_name: str,
-                          scope_config: dict[str, Any] | str,
-                          ast_tree: ast.Module,
-                          file_path: str,
-                          console) -> tuple[bool, str | None]:
+
+    def check_with_context(
+        self,
+        nodes: list[ast.AST],
+        target_name: str,
+        scope_config: dict[str, Any] | str,
+        ast_tree: ast.Module,
+        file_path: str,
+        console,
+    ) -> tuple[bool, str | None]:
         """Enhanced check with typo detection support.
-        
+
         Performs the standard constraint check, and if it fails due to no nodes
         being found, analyzes potential typos and provides helpful suggestions.
-        
+
         Args:
             nodes: List of AST nodes found by the selector
             target_name: The name that was being searched for
@@ -67,37 +69,32 @@ class IsRequiredConstraint(Constraint):
             ast_tree: The complete AST tree for analysis
             file_path: Path to the source file
             console: Console instance for output
-            
+
         Returns:
             Tuple of (constraint_result, typo_suggestion_message)
         """
         # Perform standard check first
         standard_result = self.check(nodes)
-        
+
         # If check fails and no nodes found, try typo detection
         if not standard_result and len(nodes) == 0 and target_name:
-            typo_suggestion = self._analyze_typo_and_suggest(
-                target_name, scope_config, ast_tree, file_path, console
-            )
+            typo_suggestion = self._analyze_typo_and_suggest(target_name, scope_config, ast_tree, file_path, console)
             return standard_result, typo_suggestion
-        
+
         return standard_result, None
-    
-    def _analyze_typo_and_suggest(self,
-                                 target_name: str,
-                                 scope_config: dict[str, Any] | str,
-                                 ast_tree: ast.Module,
-                                 file_path: str,
-                                 console) -> str | None:
+
+    def _analyze_typo_and_suggest(
+        self, target_name: str, scope_config: dict[str, Any] | str, ast_tree: ast.Module, file_path: str, console
+    ) -> str | None:
         """Analyze potential typos and return suggestion message.
-        
+
         Args:
             target_name: The name that was being searched for
             scope_config: Scope configuration for the search
             ast_tree: The complete AST tree for analysis
             file_path: Path to the source file
             console: Console instance for output
-            
+
         Returns:
             User-friendly typo suggestion message or None if no suggestion
         """
@@ -105,34 +102,27 @@ class IsRequiredConstraint(Constraint):
             # Lazy import to avoid circular dependencies
             if self._typo_detector is None:
                 from ..components.typo_detection import TypoDetector
+
                 self._typo_detector = TypoDetector()
-            
+
             # Analyze failed search for typos
-            suggestion = self._typo_detector.analyze_failed_search(
-                target_name, scope_config, ast_tree, file_path
-            )
-            
+            suggestion = self._typo_detector.analyze_failed_search(target_name, scope_config, ast_tree, file_path)
+
             # Log debug information
             console.print(suggestion.debug_info, level=LogLevel.DEBUG)
-            
+
             # If we have a good suggestion, return full formatted message
             if suggestion.has_suggestion:
                 # Log detailed suggestion for debugging
-                console.print(
-                    f"Typo suggestion: {suggestion.message}", 
-                    level=LogLevel.INFO
-                )
-                
+                console.print(f"Typo suggestion: {suggestion.message}", level=LogLevel.INFO)
+
                 # Return full formatted message for user display
                 return suggestion.message
-                
+
         except Exception as e:
             # Don't let typo detection break the main validation
-            console.print(
-                f"Typo detection failed: {e}", 
-                level=LogLevel.DEBUG
-            )
-        
+            console.print(f"Typo detection failed: {e}", level=LogLevel.DEBUG)
+
         return None
 
 

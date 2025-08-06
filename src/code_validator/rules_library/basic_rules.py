@@ -174,21 +174,21 @@ class FullRuleHandler(Rule):
         selected_nodes = self._selector.select(tree)
 
         self._console.print(f"Applying constraint: {self._constraint.__class__.__name__}", level=LogLevel.TRACE)
-        
+
         # Check if constraint supports typo detection context
-        if hasattr(self._constraint, 'check_with_context'):
+        if hasattr(self._constraint, "check_with_context"):
             # Get file path from console context if available
-            file_path = getattr(self._console, '_current_file_path', '<unknown>')
-            
+            file_path = getattr(self._console, "_current_file_path", "<unknown>")
+
             context_result = self._constraint.check_with_context(
-                selected_nodes, 
+                selected_nodes,
                 target_name=self.config.check.selector.name,
                 scope_config=self.config.check.selector.in_scope,
                 ast_tree=tree,
                 file_path=file_path,
-                console=self._console
+                console=self._console,
             )
-            
+
             # Handle both old (bool) and new (tuple) return formats
             if isinstance(context_result, tuple):
                 result, typo_suggestion = context_result

@@ -149,10 +149,9 @@ class TestTypoDetector(unittest.TestCase):
         )
         
         self.assertTrue(suggestion.has_suggestion)
-        self.assertIn("File", suggestion.message)
-        self.assertIn("line", suggestion.message)
-        self.assertIn("ValidationError", suggestion.message)
-        self.assertIn("Did you mean", suggestion.message)
+        self.assertIn("💡 Найдено похожее в ", suggestion.message)
+        self.assertIn("строка", suggestion.message)
+        self.assertIn("Возможно, вы имели в виду ", suggestion.message)
         self.assertIn("self.speed", suggestion.message)
         self.assertIn("self.sped", suggestion.message)
     

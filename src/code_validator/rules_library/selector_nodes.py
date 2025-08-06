@@ -86,14 +86,14 @@ class FunctionDefSelector(ScopedSelector):
             return []
 
         found_nodes: list[ast.AST] = []
-        
+
         # Для глобального scope ищем только в tree.body, не рекурсивно
         if self.in_scope_config == "global":
             nodes_to_check = search_tree.body
         else:
             # Для других scope используем ast.walk как раньше
             nodes_to_check = ast.walk(search_tree)
-        
+
         for node in nodes_to_check:
             if isinstance(node, ast.FunctionDef):
                 if self.name_to_find == "*" or node.name == self.name_to_find:
@@ -121,14 +121,14 @@ class ClassDefSelector(ScopedSelector):
             return []
 
         found_nodes: list[ast.AST] = []
-        
+
         # Для глобального scope ищем только в tree.body, не рекурсивно
         if self.in_scope_config == "global":
             nodes_to_check = search_tree.body
         else:
             # Для других scope используем ast.walk как раньше
             nodes_to_check = ast.walk(search_tree)
-        
+
         for node in nodes_to_check:
             if isinstance(node, ast.ClassDef):
                 if self.name_to_find == "*" or node.name == self.name_to_find:
@@ -164,14 +164,14 @@ class ImportStatementSelector(ScopedSelector):
             return []
 
         found_nodes: list[ast.AST] = []
-        
+
         # Для глобального scope ищем только в tree.body, не рекурсивно
         if self.in_scope_config == "global":
             nodes_to_check = search_tree.body
         else:
             # Для других scope используем ast.walk как раньше
             nodes_to_check = ast.walk(search_tree)
-        
+
         for node in nodes_to_check:
             if isinstance(node, ast.Import):
                 for alias in node.names:
@@ -210,7 +210,7 @@ class FunctionCallSelector(ScopedSelector):
             return []
 
         found_nodes: list[ast.AST] = []
-        
+
         # Для глобального scope ищем на уровне модуля, но включаем содержимое if __name__ == "__main__"
         if self.in_scope_config == "global":
             # Ищем в прямых детях модуля и в if __name__ == "__main__" блоках
@@ -235,23 +235,23 @@ class FunctionCallSelector(ScopedSelector):
                     if full_name and full_name == self.name_to_find:
                         found_nodes.append(node)
         return found_nodes
-    
-    @staticmethod   
+
+    @staticmethod
     def _is_main_guard(node: ast.If) -> bool:
         """Check node, if is block __name__ == "__main__"."""
         if not isinstance(node.test, ast.Compare):
             return False
-        
+
         left = node.test.left
         if not isinstance(left, ast.Name) or left.id != "__name__":
             return False
-        
+
         if len(node.test.ops) != 1 or not isinstance(node.test.ops[0], ast.Eq):
             return False
-        
+
         if len(node.test.comparators) != 1:
             return False
-        
+
         comparator = node.test.comparators[0]
         return isinstance(comparator, ast.Constant) and comparator.value == "__main__"
 
@@ -284,14 +284,14 @@ class AssignmentSelector(ScopedSelector):
             return []
 
         found_nodes: list[ast.AST] = []
-        
+
         # Для глобального scope ищем только в tree.body, не рекурсивно
         if self.in_scope_config == "global":
             nodes_to_check = search_tree.body
         else:
             # Для других scope используем ast.walk как раньше
             nodes_to_check = ast.walk(search_tree)
-        
+
         for node in nodes_to_check:
             # Мы поддерживаем и простое присваивание (x=5), и с аннотацией (x: int = 5)
             if isinstance(node, (ast.Assign, ast.AnnAssign)):
@@ -333,14 +333,14 @@ class UsageSelector(ScopedSelector):
             return []
 
         found_nodes: list[ast.AST] = []
-        
+
         # Для глобального scope ищем только в tree.body, не рекурсивно
         if self.in_scope_config == "global":
             nodes_to_check = search_tree.body
         else:
             # Для других scope используем ast.walk как раньше
             nodes_to_check = ast.walk(search_tree)
-        
+
         for node in nodes_to_check:
             # Проверяем и простые имена, и атрибуты, когда их "читают"
             if isinstance(node, (ast.Name, ast.Attribute)) and isinstance(getattr(node, "ctx", None), ast.Load):
@@ -393,14 +393,14 @@ class LiteralSelector(ScopedSelector):
             return []
 
         found_nodes: list[ast.AST] = []
-        
+
         # Для глобального scope ищем только в tree.body, не рекурсивно
         if self.in_scope_config == "global":
             nodes_to_check = search_tree.body
         else:
             # Для других scope используем ast.walk как раньше
             nodes_to_check = ast.walk(search_tree)
-        
+
         for node in nodes_to_check:
             # Мы ищем только узлы Constant
             if not isinstance(node, ast.Constant):
@@ -459,14 +459,14 @@ class AstNodeSelector(ScopedSelector):
             return []
 
         found_nodes: list[ast.AST] = []
-        
+
         # Для глобального scope ищем только в tree.body, не рекурсивно
         if self.in_scope_config == "global":
             nodes_to_check = search_tree.body
         else:
             # Для других scope используем ast.walk как раньше
             nodes_to_check = ast.walk(search_tree)
-        
+
         for node in nodes_to_check:
             if isinstance(node, self.node_types_to_find):
                 found_nodes.append(node)

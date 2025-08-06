@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 # ==============================================================================
 [project]
 name = "python-code-validator"
-version = "0.3.0"
+version = "0.4.0"
 description = "A flexible, AST-based framework for static validation of Python code using declarative JSON rules."
 keywords = ["validation", "linter", "static analysis", "testing", "education", "ast"]
 authors = [{ name = "Qu1nel", email = "covach.qn@gmail.com" }]

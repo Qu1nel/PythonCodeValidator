@@ -18,14 +18,7 @@ Unreleased
 Added
 -----
 
-- **[feat:typo] Smart typo detection system** - Added comprehensive typo detection infrastructure with TypoDetector, ScopeAnalyzer, and PythonStyleFormatter classes
-- **[feat:typo] Levenshtein Distance algorithm** - Implemented string similarity algorithm for basic typo detection with optimized space complexity
-- **[feat:typo] Python 3.11+ style error messages** - Added formatted error messages with file location, source highlighting, and typo suggestions
-- **[feat:typo] Semantic similarity scoring** - Enhanced confidence calculation with prefix/suffix matching and contextual relevance analysis
-- **[feat:typo] Integration with IsRequiredConstraint** - Automatic typo suggestions when validation rules fail to find required elements
-- **[feat:ux] Enhanced error reporting with numbered messages** - Added numbered error messages (1., 2., 3.) for better readability
-- **[feat:ux] User-visible typo suggestions** - Typo suggestions now appear in user output instead of debug logs only
-- **[feat:ux] Compact Russian typo format** - Created user-friendly Russian format for typo suggestions with proper indentation
+- *...*
 
 
 Changed
@@ -49,16 +42,39 @@ Removed
 Fixed
 -----
 
-- **[Critical Bug]** Fixed scope validation bug where selectors were not receiving proper scope configuration from the factory, causing rules to search in wrong scopes or ignore scope restrictions entirely.
-- **[Scope Logic]** Improved global scope handling for different selector types: assignments now only search at module level, while function calls include ``if __name__ == "__main__"`` blocks.
-- **[fix:typo] Improved target type inference** - Enhanced logic for determining whether to search for assignments, functions, or classes based on naming patterns
-- **[fix:typo] Enhanced confidence scoring** - Improved similarity scoring algorithm with semantic context awareness for better typo suggestions
+- *...*
 
 
 Security
 --------
 
 - *...*
+
+
+
+v0.4.0 - 2025-08-06
+===================
+
+Added
+-----
+
+- **[feat:typo] Smart typo detection system** - Added comprehensive typo detection infrastructure with TypoDetector, ScopeAnalyzer, and PythonStyleFormatter classes
+- **[feat:typo] Levenshtein Distance algorithm** - Implemented string similarity algorithm for basic typo detection with optimized space complexity
+- **[feat:typo] Python 3.11+ style error messages** - Added formatted error messages with file location, source highlighting, and typo suggestions
+- **[feat:typo] Semantic similarity scoring** - Enhanced confidence calculation with prefix/suffix matching and contextual relevance analysis
+- **[feat:typo] Integration with IsRequiredConstraint** - Automatic typo suggestions when validation rules fail to find required elements
+- **[feat:ux] Enhanced error reporting with numbered messages** - Added numbered error messages (1., 2., 3.) for better readability
+- **[feat:ux] User-visible typo suggestions** - Typo suggestions now appear in user output instead of debug logs only
+- **[feat:ux] Compact Russian typo format** - Created user-friendly Russian format for typo suggestions with proper indentation
+
+
+Fixed
+-----
+
+- **[Critical Bug]** Fixed scope validation bug where selectors were not receiving proper scope configuration from the factory, causing rules to search in wrong scopes or ignore scope restrictions entirely.
+- **[Scope Logic]** Improved global scope handling for different selector types: assignments now only search at module level, while function calls include ``if __name__ == "__main__"`` blocks.
+- **[fix:typo] Improved target type inference** - Enhanced logic for determining whether to search for assignments, functions, or classes based on naming patterns
+- **[fix:typo] Enhanced confidence scoring** - Improved similarity scoring algorithm with semantic context awareness for better typo suggestions
 
 
 

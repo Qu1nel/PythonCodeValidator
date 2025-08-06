@@ -203,14 +203,14 @@ class StaticValidator:
         for i, rule in enumerate(errors_to_show, 1):
             # Print numbered error message
             self._console.print(f"{i}. {rule.config.message}", level=LogLevel.WARNING, show_user=True)
-            
+
             # Print typo suggestion if available
-            if hasattr(rule, 'typo_suggestion') and rule.typo_suggestion:
+            if hasattr(rule, "typo_suggestion") and rule.typo_suggestion:
                 # Add 4-space indentation to each line of the suggestion
-                suggestion_lines = rule.typo_suggestion.split('\n')
+                suggestion_lines = rule.typo_suggestion.split("\n")
                 for line in suggestion_lines:
                     self._console.print(f"    {line}", level=LogLevel.WARNING, show_user=True)
-                
+
                 # Add empty line after suggestion for better readability
                 if i < len(errors_to_show):  # Don't add empty line after last error
                     self._console.print("", level=LogLevel.WARNING, show_user=True)
@@ -254,7 +254,7 @@ class StaticValidator:
 
         # Set current file path for typo detection context
         self._console.set_current_file_path(str(self._config.solution_path))
-        
+
         self._console.print("Starting check rules..", level=LogLevel.DEBUG)
         for rule in self._rules:
             if getattr(rule.config, "type", None) == "check_syntax":

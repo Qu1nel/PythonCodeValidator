@@ -237,10 +237,10 @@ class Console:
 
         if (not self._is_quiet) and ((not is_verdict and show_user) or (is_verdict and self._show_verdict)):
             print(message, file=self._stdout)
-    
+
     def set_current_file_path(self, file_path: str) -> None:
         """Set the current file path for typo detection context.
-        
+
         Args:
             file_path: Path to the file currently being validated
         """
