@@ -55,7 +55,7 @@
 - [Documentation](#-documentation)
 - [Contributing](#-contributing)
 - [License](#-license)
-- [Contact](#Contact)
+- [Contact](#contact)
 
 ## 📖 About The Project
 
@@ -105,10 +105,10 @@ minimal complexity.
 
 **1. For Users (from PyPI):**
 
-Install the package with one command. This will make the `validate-code` command-line tool available.
+Use Python 3.11 or later. Install the package in your active environment to make the `validate-code` command available.
 
 ```bash
-pip install python-code-validator
+python -m pip install python-code-validator
 ```
 
 **2. For Users (from source):**
@@ -118,7 +118,7 @@ If you want to install directly from the repository:
 ```bash
 git clone https://github.com/Qu1nel/PythonCodeValidator.git
 cd PythonCodeValidator
-pip install .
+python -m pip install .
 ```
 
 **3. For Developers:**
@@ -163,12 +163,31 @@ def main():
 }
 ```
 
-**Running the validator:**
+**`solution_valid.py`:**
+
+```python
+def solve():
+    return 42
+```
+
+Run the same rule against both files. The file with `solve` passes (exit code `0`).
 
 ```bash
-$ validate-code solution_simple.py rules_simple.json
-Starting validation for: solution_simple.py
-Required function 'solve' is missing.
+validate-code solution_valid.py rules_simple.json
+```
+
+```text
+Validation successful.
+```
+
+The file without `solve` fails (exit code `1`).
+
+```bash
+validate-code solution_simple.py rules_simple.json
+```
+
+```text
+1. Required function 'solve' is missing.
 Validation failed.
 ```
 
@@ -214,19 +233,21 @@ class MyGame(arcade.Window):
 }
 ```
 
-**Running the validator:**
+**Running the validator:** Arcade does not need to be installed because the validator reads the source without executing it.
 
 ```bash
-$ validate-code game.py rules_advanced.json
-Starting validation for: game.py
-Do not use 'print' inside the 'update' method.
+validate-code game.py rules_advanced.json
+```
+
+```text
+1. Do not use 'print' inside the 'update' method.
 Validation failed.
 ```
 
 ## 📚 Documentation
 
 - **Full User Guide & JSON Specification**: Our complete documentation is hosted on
-  **[Read the Docs](https://[your-project].readthedocs.io)**.
+  **[Read the Docs](https://pythoncodevalidator.readthedocs.io/en/latest/)**.
 - **Developer's Guide**: For a deep dive into the architecture, see the
   **[How It Works guide](./docs/how_it_works/index.md)**.
 - **Interactive AI-Powered Docs**: **[DeepWiki](https://deepwiki.com/Qu1nel/PythonCodeValidator)**.

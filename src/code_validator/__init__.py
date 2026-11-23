@@ -24,8 +24,8 @@ Example:
             solution_path=Path("path/to/solution.py"),
             rules_path=Path("path/to/rules.json"),
             log_level=LogLevel.INFO,
-            is_silent=False,
-            stop_on_first_fail=False
+            is_quiet=False,
+            exit_on_first_error=False,
         )
 
         # Run validation
