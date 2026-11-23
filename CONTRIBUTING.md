@@ -56,7 +56,8 @@ If you have code to contribute, please submit it as a Pull Request (PR).
 
 ## Development Setup
 
-We use `uv` for package and environment management. The easiest way to get started is with `make`.
+We use `uv` for package and environment management. Use Python 3.11.5 or later with the development lockfile.
+The easiest way to get started is with `make`.
 
 1. **Clone the repository:**
    ```bash
