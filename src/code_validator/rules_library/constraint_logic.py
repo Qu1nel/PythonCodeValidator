@@ -333,11 +333,12 @@ class MustHaveArgsConstraint(Constraint):
     This constraint can check for an exact number of arguments or for an
     exact sequence of argument names, ignoring `self` or `cls` in methods.
 
-    JSON Params:
-        count (int, optional): The exact number of arguments required.
-        names (list[str], optional): The exact list of argument names in order.
-        exact_match (bool, optional): Used with `names`. If False, only checks
-            for presence, not for exact list match. Defaults to True.
+    JSON parameters:
+
+    - ``count`` (int, optional): The exact number of arguments required.
+    - ``names`` (list of str, optional): The exact list of argument names in order.
+    - ``exact_match`` (bool, optional): Defaults to True. If False, only checks
+      for presence of the given argument names.
     """
 
     @log_initialization(level=LogLevel.TRACE)

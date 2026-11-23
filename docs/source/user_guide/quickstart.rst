@@ -10,8 +10,8 @@ This guide provides a complete, step-by-step example of how to use the
 The Goal
 ========
 
-Our goal is to verify that a student's submission file (`solution.py`) contains a
-required function named ``solve``, and that it does not use the forbidden `os` module.
+Our goal is to verify that a student's submission file (``solution.py``) contains a
+required function named ``solve``, and that it does not use the forbidden ``os`` module.
 
 Step 1: The Python Code to Validate
 ====================================
@@ -76,8 +76,9 @@ Next, we define our validation requirements in a JSON file. Let's call it
    }
 
 This file defines two rules:
-1.  **Rule 101**: Checks that a function named ``solve`` **is required**. We've marked it as critical.
-2.  **Rule 102**: Checks that the ``os`` module **is forbidden**.
+
+1. **Rule 101** checks that a function named ``solve`` **is required**. We've marked it as critical.
+2. **Rule 102** checks that the ``os`` module **is forbidden**.
 
 Step 3: Running the Validator
 =============================
@@ -99,9 +100,7 @@ finding the first error.
 .. code-block:: text
    :caption: Console Output
 
-   Starting validation for: solution.py
-   Required function 'solve' is missing.
-   Critical rule failed. Halting validation.
+   1. Required function 'solve' is missing.
    Validation failed.
 
 The output clearly indicates that the first critical rule failed, and the

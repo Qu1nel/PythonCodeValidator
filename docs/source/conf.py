@@ -1,5 +1,6 @@
-import os
 import sys
+import tomllib
+from pathlib import Path
 
 # Configuration file for the Sphinx documentation builder.
 #
@@ -14,7 +15,9 @@ project = 'Python Code Validator'
 # noinspection PyShadowingBuiltins
 copyright = '2025, Ivan Kovach (@Qu1nel)'
 author = 'Ivan Kovach (@Qu1nel)'
-release = '0.1.1'
+repository_root = Path(__file__).resolve().parents[2]
+with (repository_root / 'pyproject.toml').open('rb') as metadata:
+    release = tomllib.load(metadata)['project']['version']
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -39,5 +42,4 @@ html_static_path = ['_static']
 # -- Path setup --------------------------------------------------------------
 
 
-# noinspection PyTypeChecker
-sys.path.insert(0, os.path.abspath('../../src'))
+sys.path.insert(0, str(repository_root / 'src'))

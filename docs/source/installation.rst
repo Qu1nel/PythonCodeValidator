@@ -3,6 +3,7 @@ Installation
 ************
 
 This page provides instructions for installing the ``python-code-validator`` package.
+It requires Python 3.11 or later.
 
 .. grid:: 1 2 2 1
    :gutter: 2
@@ -12,18 +13,18 @@ This page provides instructions for installing the ``python-code-validator`` pac
 
       The recommended way to install the package for regular use is from the
       Python Package Index (PyPI) using ``pip`` or any compatible package manager.
-      This will install the latest stable version and make the ``validate-code``
+      This will install the latest available release and make the ``validate-code``
       command-line tool available in your environment.
 
       .. code-block:: bash
 
-         pip install python-code-validator
+         python -m pip install python-code-validator
 
       To upgrade to a new version, use:
 
       .. code-block:: bash
 
-         pip install --upgrade python-code-validator
+         python -m pip install --upgrade python-code-validator
 
    .. grid-item-card:: For Developers
       :shadow: md
@@ -47,7 +48,7 @@ This page provides instructions for installing the ``python-code-validator`` pac
 
       This command automates the creation of a virtual environment and the
       installation of all required packages. For more details on contributing,
-      please see the :doc:`../contributing` guide.
+      please see the :doc:`contributing` guide.
 
 Verifying the Installation
 ==========================
@@ -63,4 +64,4 @@ This should print the installed version of the package, for example:
 
 .. code-block:: text
 
-   validate-code 0.1.1
+   validate-code 0.4.0
