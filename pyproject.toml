@@ -63,6 +63,10 @@ docs = [
 #  Tool Configuration
 # ==============================================================================
 
+[tool.uv]
+# The fixed Soup Sieve releases used by the docs require Python 3.11.5 or later.
+environments = ["python_full_version >= '3.11.5'"]
+
 [tool.ruff]
 line-length = 120
 exclude = [
