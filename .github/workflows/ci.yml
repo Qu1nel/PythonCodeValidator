@@ -38,17 +38,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-uv-${{ matrix.python-version }}-
 
-      - name: Create virtual environment
-        run: uv venv
-
       - name: Install dependencies from lockfile
-        run:
-          uv pip install -e ".[dev]" && pip install coverage && uv pip install coverage
+        run: uv sync --locked --all-extras --python ${{ matrix.python-version }}
 
       - name: Run linting and tests
-        run: |
-          make lint
-          make coverage
+        run: make "PYTHON_RUNNER=uv run --no-sync --python ${{ matrix.python-version }} python" lint coverage
         shell: bash
 
       - name: Upload coverage reports to Codecov
